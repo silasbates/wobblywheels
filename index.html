@@ -735,7 +735,19 @@ function applySettings() {
     
 }
 
-
+function resetRunState() {
+  snapped = 0;
+  yourChance = Math.random() * 100;
+  fireChance = Math.random() * 67;
+  oof = false;
+  fire = false;
+  hasFired = false;
+  fireGuy = false;
+  isRaining = false;
+  totalColisions = 0;
+  target = 26;
+  makeCar();
+}
 
 function OpenMenu(menu = 'home') {
   const overlayUi = document.getElementById('overlay-ui');
@@ -746,8 +758,9 @@ function OpenMenu(menu = 'home') {
   if (homeEl) homeEl.style.display = 'none';
   if (settingsEl) settingsEl.style.display = 'none';
 
-  if (menu === 'home' && homeEl) {
-    homeEl.style.display = 'flex';
+  if (menu === 'home') {
+    if (homeEl) homeEl.style.display = 'flex';
+    resetRunState();
   } else if (menu === 'settings' && settingsEl) {
     settingsEl.style.display = 'flex';
   }
@@ -806,7 +819,8 @@ function SetPreset(type) {
 
 function StartGameplay() {
 zoom = 1
-makeCar()
+
+resetRunState();
 running = true
   const overlayUi = document.getElementById('overlay-ui');
   const homeEl = document.getElementById('home');
