@@ -1,9 +1,9 @@
   
  <!DOCTYPE html>
-<html><!DOCTYPE html>
-<html>
-<head>
+ <html>
+ <head>
     <style>
+    	
     	#slider {
         	display: none;
         }
@@ -32,39 +32,34 @@
         canvas {
   filter: saturate(1.3);
 }
-canvas {
-    -webkit-touch-callout: none; /* Disables the long-press popup menu */
-    -webkit-user-select: none;   /* Disables text/element selection */
-    user-select: none;           
-    -webkit-tap-highlight-color: rgba(0,0,0,0); /* Removes the dark blue/gray flash when tapped */
-    outline: none;               /* Removes any selection borders */
-  }
-  div {
-    -webkit-touch-callout: none; /* Disables the long-press popup menu */
-    -webkit-user-select: none;   /* Disables text/element selection */
-    user-select: none;           
-    -webkit-tap-highlight-color: rgba(0,0,0,0); /* Removes the dark blue/gray flash when tapped */
-    outline: none;               /* Removes any selection borders */
-  }
-/* Scale up on hover */
-button:hover, .btn:hover {
-  transform: translateY(5px);
+
+button,
+.btn {
+  /* Set base transition for smooth scaling */
+  transition: transform 0.25s ease-in-out;
+  transform: scale(1);
 }
 
-/* Shrink AND move down on click (active state) */
-button:active, .btn:active {
-  /* scale() shrinks it, translateY() pushes it down 4 pixels */
-  transform: scale(0.9) translateY(5px);
+/* Scale up smoothly on hover */
+button:hover,
+.btn:hover {
+  transform: scale(1.1); /* Adjust 1.08 to make it bigger or smaller */
 }
+
+/* Scale down on click (:active state) */
+button:active,
+.btn:active {
+  transform: scale(0.9); /* Adjust 0.95 for a stronger or lighter press effect */
+}
+
+
         body {
             margin: 0;
             overflow: hidden;
             background-color: skyblue;
         }
 		#conrolCenter {
-        	/*width 100%;*/
-            border: 1px solid #ddd;
-        	border-radius: 8px;
+            border: 1px solid #002;
             color: black;
             height: 80px;
         
@@ -131,7 +126,6 @@ margin: 0.5px;
         canvas {
             display: block;
              filter: saturate(1.2); /* Boosts saturation to 200% */
-             zoom: 1;
         } 
         .side {
         	
@@ -162,7 +156,6 @@ button {
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
-  transition: background 0.2s;
 }
 
 button:hover {
@@ -175,7 +168,14 @@ button.active {
   font-weight: bold;
 }
         
-        
+*, *::before, *::after, div, button, a, img {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  
+  -webkit-touch-callout: none;
+  touch-action: manipulation; 
+}
 #overlay-ui { 
   position: absolute; 
   top: 0; 
@@ -225,7 +225,6 @@ button.active {
   cursor: pointer;
   border-radius: 8px;
   text-transform: lowercase;
-  transition: background 0.2s, transform 0.1s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -237,7 +236,6 @@ button.active {
 }
 
 #playButton:active {
-  transform: scale(0.97);
 }
 
 #settings {
@@ -283,7 +281,6 @@ button.active {
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
-  transition: background 0.2s;
 }
 
 .tab-btn:hover {
@@ -334,7 +331,6 @@ button.active {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-  transition: background 0.2s;
 }
 
 .preset-btn:hover {
@@ -407,7 +403,6 @@ button.active {
   cursor: pointer;
   border-radius: 8px;
   text-transform: lowercase;
-  transition: background 0.2s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -424,12 +419,110 @@ button.active {
   background: rgba(255, 255, 255, 0.25);
 }
 
+canvas {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+@media (max-width: 1200px) {
+  #game {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .canvasContainer,
+  .container {
+    position: relative;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .canvasContainer {
+    display: flex;
+    flex-direction: column;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  #overlay-ui {
+    zoom: 1;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: border-box;
+  }
+
+  #home {
+    box-sizing: border-box;
+    max-width: calc(100vw - 32px);
+    padding: 32px 24px;
+  }
+
+  #home h1 {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    text-align: center;
+  }
+
+  #settings {
+    box-sizing: border-box;
+    width: calc(100% - 24px);
+    height: calc(100% - 24px);
+    padding: 20px 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabs-header {
+    gap: 6px;
+  }
+
+  .tab-btn {
+    min-width: 0;
+    padding: 10px 5px;
+    font-size: 0.95rem;
+  }
+
+  .setting-group {
+    margin-bottom: 16px;
+  }
+
+  .slider-row {
+    gap: 12px;
+  }
+
+  .value-input {
+    width: 72px;
+  }
+
+  .action-footer {
+    gap: 10px;
+  }
+
+  .back-btn,
+  .settings-play-btn {
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  button:hover,
+  .btn:hover {
+    transform: none;
+  }
+}
+
     </style>
-    <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <title>Wobbly Wheels</title>
-</head>
 </head>
 <body>
 <div id="game">
@@ -454,7 +547,7 @@ button.active {
     </label>
   
     <button class="drawing" onclick="openSettingsMenu()">menu</button>
-    <button class="drawing" onclick="resetRunState()">reset</button>
+    <button class="drawing" onclick="makeCar()">reset</button>
     <button class="drawing" onclick="makeMap()">remake map</button>
     <button class="drawing" onclick="newCarColor()">car color</button>
     <button id="fullscrean" class="drawing" onclick="fullscrean()">⛶</button>
@@ -494,7 +587,6 @@ button.active {
 
 
 
-<link rel="icon" type="image/png" href="carLogo.PNG?v=1">
 
 
 
@@ -657,12 +749,8 @@ button.active {
 </div>
 
 
-
-<link rel="icon" type="image/png" href="carLogo.PNG?v=1">
-
-
-
 <script>
+let copyed = false;
  let carBodySize = 4.5
  let isRaining = false
  let mapType = 2
@@ -670,7 +758,8 @@ button.active {
  let mapStep = 140
  let mapSteepness = 200
  let drawbg = false;
- let DStiffness = 0.99999999999999999999999999999
+ let DStiffness = 0.9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+ let bendPoint = 2
     let springSnap = 3
     let roundingAmount = 100
     let runEvents = true; 
@@ -678,6 +767,11 @@ button.active {
     const ctx = canvas.getContext('2d');
    	const overlayUi = document.getElementById('overlay-ui');
 
+function preventBrowserZoom(event) {
+    event.preventDefault();
+}
+document.addEventListener('gesturestart', preventBrowserZoom, { passive: false });
+document.addEventListener('gesturechange', preventBrowserZoom, { passive: false });
 
 
 function toggleEvents(button) {
@@ -755,19 +849,7 @@ function applySettings() {
     
 }
 
-function resetRunState() {
-  snapped = 0;
-  yourChance = Math.random() * 100;
-  fireChance = Math.random() * 67;
-  oof = false;
-  fire = false;
-  hasFired = false;
-  fireGuy = false;
-  isRaining = false;
-  totalColisions = 0;
-  target = 26;
-  makeCar();
-}
+
 
 function OpenMenu(menu = 'home') {
   const overlayUi = document.getElementById('overlay-ui');
@@ -778,9 +860,8 @@ function OpenMenu(menu = 'home') {
   if (homeEl) homeEl.style.display = 'none';
   if (settingsEl) settingsEl.style.display = 'none';
 
-  if (menu === 'home') {
-    if (homeEl) homeEl.style.display = 'flex';
-    resetRunState();
+  if (menu === 'home' && homeEl) {
+    homeEl.style.display = 'flex';
   } else if (menu === 'settings' && settingsEl) {
     settingsEl.style.display = 'flex';
   }
@@ -824,13 +905,17 @@ function SetPreset(type) {
   if (type === 'jelly') {
     if (btnJelly) btnJelly.classList.add('selected');
     const slider = document.getElementById('stiffnessSlider');
+    
+    const slider2 = document.getElementById('brittlenessSlider');
     if (slider) slider.value = 0.5;
     SyncFromSlider('stiffness', 0.5);
     SyncFromSlider('brittleness', 8);
+    if (slider) slider.value = 8;
   } else if (type === 'realistic') {
     if (btnRealistic) btnRealistic.classList.add('selected');
     const slider = document.getElementById('stiffnessSlider');
     if (slider) slider.value = 0.999999;
+    if (slider2) slider.value = 4;
     SyncFromSlider('stiffness', 0.999999);
     SyncFromSlider('brittleness', 4);
     
@@ -839,8 +924,7 @@ function SetPreset(type) {
 
 function StartGameplay() {
 zoom = 1
-
-resetRunState();
+makeCar()
 running = true
   const overlayUi = document.getElementById('overlay-ui');
   const homeEl = document.getElementById('home');
@@ -1036,7 +1120,7 @@ let carBalls = false;
 
 
 
-
+let menuZoom = -300
 let time = 0
 
 
@@ -1053,6 +1137,7 @@ function update() {
     }
     if (running) {
     	carBalls = false
+        menuZoom = -300
     }
 	if (isRightPressed || driveLeft) {
 		
@@ -1093,15 +1178,16 @@ function update() {
     
         if (!running) {
         //balls = []
-        scrollX = -50;
-        scrollY = -80;
+        menuZoom += (-50 - menuZoom) / 10
+        scrollX = menuZoom;
+        scrollY = menuZoom - 30;
         zoom = 0.25;
         
         ctx.save();
         const cx = canvas.width / 2;
         const cy = canvas.height / 2;
         ctx.translate(cx - 250, cy);
-        ctx.rotate((((Math.sin(time / 80) * 5) - 7) * Math.PI) / 180);
+        ctx.rotate((((Math.sin(time / 40) * 10) - 7) * Math.PI) / 180);
         ctx.translate(-(cx - 250), -cy);
 
         for (let b of carBalls) {
@@ -1261,7 +1347,7 @@ if (b.anchor) {
         for (let s of b.spring) {
             if (b.deadFire) return
             if (balls[s]) {
-                spring(b, balls[s], b.springDist[b.spring.indexOf(s)]);
+                spring(b, balls[s], b.springDist[b.spring.indexOf(s)], b.spring.indexOf(s));
             }
         }
         }
@@ -1271,7 +1357,7 @@ if (b.anchor) {
         for (let s of b.spring) {
             // Safety check: ensure the connected ball exists
             if (balls[s]) {
-                spring(b, balls[s], b.springDist[b.spring.indexOf(s)]);
+                spring(b, balls[s], b.springDist[b.spring.indexOf(s)], b.spring.indexOf(s));
             }
         }
         if (b.anchor) {
@@ -1478,9 +1564,12 @@ function doEvents() {
     let ropeX = null
     let ropeY = null
     let snapped = 0
+   let pointerStartedOnCanvas = false
    // let bad = []
         document.addEventListener('pointerdown', (event) => {
     //if (running) return;
+    if (!canvas.contains(event.target)) return;
+    pointerStartedOnCanvas = true;
     const rect = canvas.getBoundingClientRect();
     let mouseX = event.clientX - rect.left;
     let mouseY = event.clientY - rect.top;
@@ -1504,7 +1593,7 @@ mouseX = (mouseX - scrollX / zoom) * zoom
     				let ballIndex = springsList[i];
   					let ball = balls[ballIndex];
     
-   					if (ball && (ball.color === "black" || ball.fire)) {
+   					if (ball && (ball.color === "black" || ball.fire || ball.snow)) {
         				springsList.splice(i, 1);
         				springsDistList.splice(i, 1);
     				}
@@ -1551,6 +1640,8 @@ function run() {
 running =  true
 }  
 document.addEventListener('pointerup', (event) => {
+    if (!pointerStartedOnCanvas) return;
+    pointerStartedOnCanvas = false;
     const rect = canvas.getBoundingClientRect();
     let mouseUpX = event.clientX - rect.left;
     let mouseUpY = event.clientY - rect.top;
@@ -1718,8 +1809,15 @@ let copy = []
         let tallness = 2
         let wideness = 5
         function resize(levelIsThere = false) {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight - 50;
+            const touchLayout = window.matchMedia('(max-width: 1200px)').matches;
+            if (touchLayout) {
+                const bounds = canvas.getBoundingClientRect();
+                canvas.width = Math.max(1, Math.round(bounds.width || window.innerWidth));
+                canvas.height = Math.max(1, Math.round(bounds.height || window.innerHeight - 64));
+            } else {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight - 50;
+            }
             
             if (levelIsThere) {
                
@@ -1732,6 +1830,14 @@ level[0] = {x1: -100, y1: canvas.height * tallness - 5, x2: canvas.width * widen
             }
         }
 resize()
+        function resizeForViewport() {
+            window.requestAnimationFrame(() => resize(true));
+        }
+        window.addEventListener('resize', resizeForViewport, { passive: true });
+        window.addEventListener('orientationchange', resizeForViewport, { passive: true });
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', resizeForViewport, { passive: true });
+        }
 /*makeLine(5, canvas.height - 5, canvas.width - 5, canvas.height - 5)
         makeLine(5, 0, 5, canvas.height - 5)
         makeLine(canvas.width - 5, 0, canvas.width - 5, canvas.height - 5)
@@ -2001,35 +2107,63 @@ if (ball1.snow && Math.random() > 0.5 && !ball2.snow) {
 }
     }
 }
-        function spring(b1, b2, dist, stiffness = DStiffness, springIndex) {
 
+
+
+
+
+
+
+        function spring(b1, b2, dist, index, stiffness = DStiffness) {
+        b1.scaled = b1.scaled || 1
+        b2.scaled = b2.scaled || 1
+		let springIndex = index;
 
     const distOfPoints = getDistance(b1.x, b1.y, b2.x, b2.y);
     let snapThreshold = springSnap;
-    if (balls.indexOf(b1) < wheel2[1]) {snapThreshold *= 3  }
+    let bendThreshold = bendPoint;
+    if (balls.indexOf(b1) < wheel2[1]) {snapThreshold *= Infinity  }
+    
+    if (balls.indexOf(b1) < wheel2[1]) {bendThreshold *= Infinity  }
 const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || (pair[0] === b2 && pair[1] === b1));
     const dx = b1.x - b2.x;
     const dy = b1.y - b2.y;
-    if (distOfPoints > dist * snapThreshold || distOfPoints < dist * 1 / snapThreshold) {
+    if (distOfPoints > dist * snapThreshold || distOfPoints < dist * 1 / snapThreshold || b1.scaled > Math.max(1.5, snapThreshold / 1.5) || b1.scaled < 1 / snapThreshold) {
         if (!isHydrolic) {
-            if (getInput('snap')) {
                 b1.spring.splice(springIndex, 1);
                 b1.springDist.splice(springIndex, 1);
-                if (balls.indexOf(b1) < 43 || balls.indexOf(b2) < 43) {
-                snapped++
-                }
+                if (balls.indexOf(b1) < 43 || balls.indexOf(b2) < 43) snapped++
                 return;
-            }
+           
         }
         if (balls.indexOf(ball1) < 43) {
                 totalColisions++
 }
-   
+  
     if (balls.indexOf(ball2) < 43) {
                 totalColisions++
 }
    
     }
+if (distOfPoints > dist * bendThreshold || distOfPoints < dist * 1 / bendThreshold) {
+    if (!isHydrolic) {
+        // Fix: Properly scale or transition the spring target distance instead of multiplying by a massive sum
+        const oldSpringDist = b1.springDist[springIndex]
+        b1.springDist[springIndex] = (distOfPoints + (dist * 0.75)) / 1.75; 
+        b1.scaled *= b1.springDist / oldSpringDist
+        if (balls.indexOf(b1) < 43 || balls.indexOf(b2) < 43) {
+            snapped += 0.25;
+        }
+        return;
+    }
+    // Fix: Changed undefined ball1/ball2 to b1/b2
+    if (balls.indexOf(b1) < 43) { 
+        totalColisions++; 
+    }
+    if (balls.indexOf(b2) < 43) { 
+        totalColisions++; 
+    }
+}
 
 
     ctx.strokeStyle = b1.color
@@ -2207,8 +2341,20 @@ spawnDummy(true)
 
             }
             if (event.key === 'c') {
-fire = !fire
-}
+				/*copyed = [];
+                ccalert(copyed)
+                for (b of balls) {
+                	copyed.push(b)
+                }*/
+			}
+            if (event.key === 'p') {
+				//if (copyed) {
+                //balls = []
+                	//balls = [...copyed];
+                //}
+                alert(balls)
+                
+			}
             if (event.key === 'ArrowDown') {
                 if (running) {
                
@@ -2335,7 +2481,17 @@ function scroll() {
      
 zoom = 1
 function makeCar() {
-springSnap = 0;
+fireChance = Math.random() * 67
+yourChance = Math.random() * 100
+snapped = 0
+
+target = 26
+oof = false
+fire = false
+hasFired = false
+fireGuy = false
+isRaining = false
+
 balls =
 [{"x":82,"y":236,"xVel":0,"yVel":0,"radias":7,"spring":[10, 4],"springDist":[18.867962264113206,70.7248188403477],"anchor":false},{"x":83,"y":205,"xVel":0,"yVel":0,"radias":7,"spring":[0,11,6,7,3],"springDist":[31.016124838541643,27.892651361962706,63.89053137985315,63.52952069707436,40.459856648287825],"anchor":false},{"x":96,"y":186,"xVel":0,"yVel":0,"radias":7,"spring":[1,10],"springDist":[23.021728866442675,60.03332407921454],"anchor":false},{"x":114,"y":179,"xVel":0,"yVel":0,"radias":7,"spring":[2,11],"springDist":[19.313207915827967,33.24154027718932],"anchor":false},{"x":131,"y":185,"xVel":0,"yVel":0,"radias":7,"spring":[3,1],"springDist":[18.02775637731995,52],"anchor":false},{"x":141,"y":206,"xVel":0,"yVel":0,"radias":7,"spring":[4,11,1],"springDist":[23.259406699226012,31.57530680769389,58.008620049092706],"anchor":false},{"x":144,"y":224,"xVel":0,"yVel":0,"radias":7,"spring":[5,11],"springDist":[18.248287590894655,36.0555127546399],"anchor":false},{"x":139,"y":235,"xVel":0,"yVel":0,"radias":7,"spring":[6,11,2,10],"springDist":[12.08304597359457,37.013511046643494,65.19202405202648,42.44997055358225],"anchor":false},{"x":128,"y":249,"xVel":0,"yVel":0,"radias":7,"spring":[7,11,2],"springDist":[17.804493814764854,41.14608122288197,70.66116330771806],"anchor":false},{"x":113,"y":252,"xVel":0,"yVel":0,"radias":7,"spring":[8,11,3],"springDist":[15.297058540778355,40.11234224026316,73.00684899377592],"anchor":false},{"x":98,"y":246,"xVel":0,"yVel":0,"radias":7,"spring":[9,11,1,4,5],"springDist":[16.155494421403514,36.0555127546399,43.65775990588614,69.35416353759881,58.728187440104094],"anchor":false},{"x":110,"y":212,"xVel":0,"yVel":0,"radias":7,"spring":[4,2,0,22,24],"springDist":[34.20526275297414,29.5296461204668,36.87817782917155,61.741396161732524,53.150729063673246],"anchor":false},{"x":207,"y":231,"xVel":0,"yVel":0,"radias":7,"spring":[13,21,16],"springDist":[24.186773244895647,30,58.52349955359813],"anchor":false},{"x":204,"y":207,"xVel":0,"yVel":0,"radias":7,"spring":[14,21,17,14,19],"springDist":[21.213203435596427,27.658633371878665,58.69412236331676,21.213203435596427,49.678969393496885],"anchor":false},{"x":219,"y":192,"xVel":0,"yVel":0,"radias":7,"spring":[15,18],"springDist":[22.20360331117452,51.85556864985669],"anchor":false},{"x":241,"y":189,"xVel":0,"yVel":0,"radias":7,"spring":[16,21,19,20],"springDist":[18.027756377319946,26,56.222771187482394,52],"anchor":false},{"x":256,"y":199,"xVel":0,"yVel":0,"radias":7,"spring":[17],"springDist":[18.02775637731995],"anchor":false},{"x":262,"y":216,"xVel":0,"yVel":0,"radias":7,"spring":[18,21,14],"springDist":[18.867962264113206,31.144823004794876,49.24428900898052],"anchor":false},{"x":252,"y":232,"xVel":0,"yVel":0,"radias":7,"spring":[19,15,13],"springDist":[20.615528128088304,44.384682042344295,54.120236510939236],"anchor":false},{"x":236,"y":245,"xVel":0,"yVel":0,"radias":7,"spring":[20,21,13,13,15],"springDist":[17,32.38826948140329,49.678969393496885,49.678969393496885,56.222771187482394],"anchor":false},{"x":221,"y":237,"xVel":0,"yVel":0,"radias":7,"spring":[12],"springDist":[15.231546211727817],"anchor":false},{"x":231,"y":213,"xVel":0,"yVel":0,"radias":7,"spring":[20,18,16,14,27,29,11,26],"springDist":[26,28.31960451701259,28.65309756378881,24.186773244895647,66.85057965343307,60.29925372672534,121.00413216084812,79.2085853932514],"anchor":false},{"x":84,"y":156,"xVel":0,"yVel":0,"radias":7,"spring":[44,46],"springDist":[20.09975124224178,35.51056180912941],"anchor":false},{"x":100,"y":158,"xVel":0,"yVel":0,"radias":7,"spring":[22,11,43],"springDist":[16.1245154965971,54.91812087098393,44.011362169330766],"anchor":false},{"x":121,"y":160,"xVel":0,"yVel":0,"radias":7,"spring":[23,46,41,46],"springDist":[21.095023109728984,24.041630560342615,36.6742416417845,24.041630560342615],"anchor":false},{"x":147,"y":159,"xVel":0,"yVel":0,"radias":7,"spring":[24,11,41,40],"springDist":[26.019223662515373,64.63745044476924,33.52610922848042,34.48187929913333],"anchor":false},{"x":174,"y":158,"xVel":0,"yVel":0,"radias":7,"spring":[25,45,11,36],"springDist":[27.018512172212592,40.22437072223754,83.73768566183328,75.6108457828637],"anchor":false},{"x":193,"y":158,"xVel":0,"yVel":0,"radias":7,"spring":[26,45,37],"springDist":[19,33.24154027718932,67.89698078707183],"anchor":false},{"x":212,"y":157,"xVel":0,"yVel":0,"radias":7,"spring":[27,21,35],"springDist":[19.026297590440446,59.135437767890075,65.62011886609167],"anchor":false},{"x":237,"y":153,"xVel":0,"yVel":0,"radias":7,"spring":[28,45,34],"springDist":[25.317977802344327,48.82622246293481,51.0098029794274],"anchor":false},{"x":255,"y":157,"xVel":0,"yVel":0,"radias":7,"spring":[29,21,33],"springDist":[18.439088914585778,60.92618484691127,40],"anchor":false},{"x":271,"y":155,"xVel":0,"yVel":0,"radias":7,"spring":[30,45],"springDist":[16.1245154965971,79.84985911070852],"anchor":false},{"x":269,"y":135,"xVel":0,"yVel":0,"radias":7,"spring":[31,45,30],"springDist":[20.09975124224178,72.69112738154499,26.076809620810597],"anchor":false},{"x":255,"y":117,"xVel":0,"yVel":0,"radias":7,"spring":[32,45,31],"springDist":[22.80350850198276,58.54912467321778,41.2310562561766],"anchor":false},{"x":238,"y":102,"xVel":0,"yVel":0,"radias":7,"spring":[33,45,30],"springDist":[22.671568097509265,47.01063709417263,57.56735185849702],"anchor":false},{"x":221,"y":92,"xVel":0,"yVel":0,"radias":7,"spring":[34,45,29],"springDist":[19.723082923316017,40.80441152620633,63.06346010171025],"anchor":false},{"x":200,"y":87,"xVel":0,"yVel":0,"radias":7,"spring":[35,45],"springDist":[21.587033144922902,38.118237105091836],"anchor":false},{"x":182,"y":91,"xVel":0,"yVel":0,"radias":7,"spring":[36,45,28],"springDist":[18.439088914585778,37.16180835212409,72.49827584156742],"anchor":false},{"x":164,"y":96,"xVel":0,"yVel":0,"radias":7,"spring":[37,45],"springDist":[18.681541692269406,43.9317652729776],"anchor":false},{"x":157,"y":108,"xVel":0,"yVel":0,"radias":7,"spring":[38,45,27],"springDist":[13.892443989449806,43.46262762420146,61.61168720299746],"anchor":false},{"x":157,"y":126,"xVel":0,"yVel":0,"radias":7,"spring":[39,26],"springDist":[18,36.235341863986875],"anchor":false},{"x":137,"y":127,"xVel":0,"yVel":0,"radias":7,"spring":[40,46],"springDist":[20.024984394500787,25.079872407968903],"anchor":false},{"x":113,"y":123,"xVel":0,"yVel":0,"radias":7,"spring":[41,23],"springDist":[24.331050121192874,37.33630940518894],"anchor":false},{"x":84,"y":117,"xVel":0,"yVel":0,"radias":7,"spring":[42,46],"springDist":[29.61418578992169,36.05551275463989],"anchor":false},{"x":82,"y":136,"xVel":0,"yVel":0,"radias":7,"spring":[43],"springDist":[19.1049731745428],"anchor":false},{"x":197,"y":125,"xVel":0,"yVel":0,"radias":7,"spring":[40,25,28,30],"springDist":[40.01249804748512,60.4648658313239,35.34119409414458,66.24198064671678],"anchor":false},{"x":114,"y":137,"xVel":0,"yVel":0,"radias":7,"spring":[42,44,23,25,40,26],"springDist":[14.0356688476182,32.01562118716424,25.238858928247925,39.66106403010388,44.384682042344295,63.56886030125127],"anchor":false}]
     /*balls.splice(wheel2[1], balls.length - (wheel2[1]))
@@ -2875,143 +3031,157 @@ function deleteBall(ballIndex) {
 
 
 
-function drawBg(CTX = ctx, CANVAS = canvas) { 
-  /*// 1. Handle Scrolling and Infinite Loop Physics 
-  distanceBg -= (speed - 0.3045) * 3; 
-  if (distanceBg - 540 < -540) { 
-    distanceBg -= Math.floor((distanceBg - 540) / -540) * -540; 
-  } */
-  
-  const mountainData = [ 
-    { color: "#a1a8ad", x1: -20, x2: 60, x3: 140, h: 80}, 
-    { color: "#7b8387", x1: 80, x2: 160, x3: 240, h: 110}, 
-    { color: "#b3b9bc", x1: 180, x2: 270, x3: 360, h: 75}, 
-    { color: "#60676b", x1: 300, x2: 400, x3: 500, h: 130}, 
-    { color: "#8d9498", x1: 420, x2: 510, x3: 600, h: 95} 
-  ]; 
 
-  let skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height / 2); 
-  skyGradient.addColorStop(0, "#3b7eb3"); 
-  skyGradient.addColorStop(0.4, "#73aed9"); 
+function drawBg(CTX = ctx, CANVAS = canvas) {
+  /*// 1. Handle Scrolling and Infinite Loop Physics
+  distanceBg -= (speed - 0.3045) * 3;
+  if (distanceBg - 540 < -540) {
+      distanceBg -= Math.floor((distanceBg - 540) / -540) * -540;
+  }
+  */
+
+
+  const mountainData = [
+    { color: "#a1a8ad", x1: -20, x2: 60, x3: 140, h: 80},
+    { color: "#7b8387", x1: 80, x2: 160, x3: 240, h: 110},
+    { color: "#b3b9bc", x1: 180, x2: 270, x3: 360, h: 75},
+    { color: "#60676b", x1: 300, x2: 400, x3: 500, h: 130},
+    { color: "#8d9498", x1: 420, x2: 510, x3: 600, h: 95}
+  ];
+
+  let skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
+  skyGradient.addColorStop(0, "#3b7eb3");   
+  skyGradient.addColorStop(0.4, "#73aed9");  
   skyGradient.addColorStop(0.75, "#f79e45"); 
-  skyGradient.addColorStop(1, "#fcd060"); 
-  ctx.fillStyle = skyGradient; 
-  ctx.fillRect(0, 0, canvas.width, canvas.height); 
+  skyGradient.addColorStop(1, "#fcd060");   
+  ctx.fillStyle = skyGradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = '#ffb'; 
-  ctx.strokeStyle = "#000000"; 
+
+  ctx.fillStyle = '#ffb';
+  ctx.strokeStyle = "#000000";
   ctx.lineWidth = 4; 
-  ctx.beginPath(); 
-  ctx.arc(canvas.width - 120, canvas.height - 400, 50, 0, 2 * Math.PI); 
-  ctx.fill(); 
-  ctx.stroke(); 
+  ctx.beginPath();
+  ctx.arc(canvas.width - 120, canvas.height - 400, 50, 0, 2 * Math.PI);
+  ctx.fill();
+  ctx.stroke();
 
-  ctx.lineJoin = "round"; 
-  const baseY = canvas.height / 2 + 15; 
+ ctx.lineJoin = "round";
+  const baseY = canvas.height / 2 + 15;
+  const offsets = [-540, 0, 540, 1080]; 
 
-  // CHANGED: Expanded offsets from 4 repetitions to 6 repetitions 
-  // This pushes coverage further left (-1080) and further right (1620) to prevent gaps
-  const offsets = [-1080, -540, 0, 540, 1080, 1620]; 
-
-  for (let offset of offsets) { 
-    for (let m of mountainData) { 
-      ctx.fillStyle = m.color; 
-      ctx.strokeStyle = "#000000"; 
+  for (let offset of offsets) {
+    for (let m of mountainData) {
+      ctx.fillStyle = m.color;
+      ctx.strokeStyle = "#000000";
       ctx.lineWidth = 5; 
-      ctx.beginPath(); 
-      ctx.moveTo(0 + m.x1 + offset, baseY); 
-      ctx.lineTo(0 + m.x2 + offset, baseY - m.h); 
-      ctx.lineTo(0 + m.x3 + offset, baseY); 
-      ctx.closePath(); 
-      ctx.fill(); 
-      ctx.stroke(); 
-    } 
-  } 
+      ctx.beginPath();
+      ctx.moveTo(0 + m.x1 + offset, baseY);
+      ctx.lineTo(0 + m.x2 + offset, baseY - m.h);
+      ctx.lineTo(0 + m.x3 + offset, baseY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
 
-  ctx.fillStyle = "#5c9e31"; 
-  ctx.fillRect(0, baseY, canvas.width, canvas.height - baseY); 
-  ctx.strokeStyle = "#000000"; 
-  ctx.lineWidth = 5; 
-  ctx.beginPath(); 
-  ctx.moveTo(0, baseY); 
-  ctx.lineTo(canvas.width, baseY); 
-  ctx.stroke(); 
+  ctx.fillStyle = "#5c9e31";
+  ctx.fillRect(0, baseY, canvas.width, canvas.height - baseY);
 
-  for (let offset of offsets) { 
-    const startX = 0 + offset; 
-    const endX = 540 + offset; 
-    
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(0, baseY);
+  ctx.lineTo(canvas.width, baseY);
+  ctx.stroke();
+
+  for (let offset of offsets) {
+    const startX = 0 + offset;
+    const endX = 540 + offset;
+
+
     ctx.fillStyle = "#e6c587"; 
-    ctx.beginPath(); 
-    ctx.moveTo(startX, baseY + 30); 
-    ctx.bezierCurveTo( 
-      startX + 180, baseY + 90, startX + 360, baseY - 10, endX, baseY + 30 
-    ); 
-    ctx.lineTo(endX, canvas.height); 
-    ctx.lineTo(startX, canvas.height); 
-    ctx.closePath(); 
+    ctx.beginPath();
+    ctx.moveTo(startX, baseY + 30);
+    ctx.bezierCurveTo(
+      startX + 180, baseY + 90, 
+      startX + 360, baseY - 10, 
+      endX, baseY + 30          
+    );
+    ctx.lineTo(endX, canvas.height);
+    ctx.lineTo(startX, canvas.height);
+    ctx.closePath();
     ctx.fill(); 
-    
-    ctx.strokeStyle = "#000000"; 
-    ctx.lineWidth = 5; 
-    ctx.beginPath(); 
-    ctx.moveTo(startX, baseY + 30); 
-    ctx.bezierCurveTo(startX + 180, baseY + 90, startX + 360, baseY - 10, endX, baseY + 30); 
-    ctx.stroke(); 
 
-    let lakeGradient = ctx.createLinearGradient(0, baseY + 80, 0, canvas.height); 
-    lakeGradient.addColorStop(0, "#23537d"); 
-    lakeGradient.addColorStop(0.7, "#15334d"); 
-    ctx.fillStyle = lakeGradient; 
-    ctx.beginPath(); 
-    ctx.moveTo(startX, baseY + 90); 
-    ctx.bezierCurveTo( 
-      startX + 180, baseY + 150, startX + 360, baseY + 50, endX, baseY + 90 
-    ); 
-    ctx.lineTo(endX, canvas.height); 
-    ctx.lineTo(startX, canvas.height); 
-    ctx.closePath(); 
-    ctx.fill(); 
     
-    ctx.strokeStyle = "#000000"; 
-    ctx.lineWidth = 5; 
-    ctx.beginPath(); 
-    ctx.moveTo(startX, baseY + 90); 
-    ctx.bezierCurveTo(startX + 180, baseY + 150, startX + 360, baseY + 50, endX, baseY + 90); 
-    ctx.stroke(); 
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(startX, baseY + 30);
+    ctx.bezierCurveTo(startX + 180, baseY + 90, startX + 360, baseY - 10, endX, baseY + 30);
+    ctx.stroke();
+
+    
+    let lakeGradient = ctx.createLinearGradient(0, baseY + 80, 0, canvas.height);
+    lakeGradient.addColorStop(0, "#23537d");  
+    lakeGradient.addColorStop(0.7, "#15334d"); 
+    ctx.fillStyle = lakeGradient;
+    ctx.beginPath();
+    ctx.moveTo(startX, baseY + 90);
+    ctx.bezierCurveTo(
+      startX + 180, baseY + 150, 
+      startX + 360, baseY + 50,  
+      endX, baseY + 90
+    );
+    ctx.lineTo(endX, canvas.height);
+    ctx.lineTo(startX, canvas.height);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(startX, baseY + 90);
+    ctx.bezierCurveTo(startX + 180, baseY + 150, startX + 360, baseY + 50, endX, baseY + 90);
+    ctx.stroke();
 
     ctx.fillStyle = "rgba(78, 182, 194, 0.45)"; 
-    ctx.beginPath(); 
-    ctx.moveTo(startX, baseY + 80); 
-    ctx.bezierCurveTo( 
-      startX + 180, baseY + 140, startX + 360, baseY + 40, endX, baseY + 80 
-    ); 
-    ctx.lineTo(endX, canvas.height); 
-    ctx.lineTo(startX, canvas.height); 
-    ctx.closePath(); 
-    ctx.fill(); 
-    
-    ctx.strokeStyle = "#ffffff"; 
-    ctx.lineWidth = 4; 
-    ctx.lineCap = "round"; 
-    ctx.beginPath(); 
-    ctx.moveTo(startX, baseY + 80); 
-    ctx.bezierCurveTo( 
-      startX + 180, baseY + 140, startX + 360, baseY + 40, endX, baseY + 80 
-    ); 
-    ctx.stroke(); 
-  } 
+    ctx.beginPath();
+    ctx.moveTo(startX, baseY + 80);
+    ctx.bezierCurveTo(
+      startX + 180, baseY + 140,
+      startX + 360, baseY + 40,
+      endX, baseY + 80
+    );
+    ctx.lineTo(endX, canvas.height);
+    ctx.lineTo(startX, canvas.height);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 4;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(startX, baseY + 80);
+    ctx.bezierCurveTo(
+      startX + 180, baseY + 140,
+      startX + 360, baseY + 40,
+      endX, baseY + 80
+    );
+    ctx.stroke();
+  }
 
   ctx.strokeStyle = "rgba(252, 208, 96, 0.7)"; 
-  ctx.lineWidth = 5; 
-  ctx.lineCap = "round"; 
-  ctx.beginPath(); 
-  ctx.moveTo(canvas.width - 220, canvas.height - 80); 
-  ctx.lineTo(canvas.width - 60, canvas.height - 80); 
-  ctx.moveTo(canvas.width - 170, canvas.height - 50); 
-  ctx.lineTo(canvas.width - 30, canvas.height - 50); 
-  ctx.stroke(); 
-  ctx.lineCap = "butt"; 
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(canvas.width - 220, canvas.height - 80);
+  ctx.lineTo(canvas.width - 60, canvas.height - 80);
+  ctx.moveTo(canvas.width - 170, canvas.height - 50);
+  ctx.lineTo(canvas.width - 30, canvas.height - 50);
+  ctx.stroke();
+
+  ctx.lineCap = "butt";
 }
 
 drawbg = true
@@ -3020,4 +3190,3 @@ drawingInput = 'drive'
     </script>
 </body> 
 </html>
-
