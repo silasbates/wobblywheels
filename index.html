@@ -244,9 +244,9 @@ button.active {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  width: 92%;
+  width: 84%;
   height: 90%;
-  max-width: 900px;
+  max-width: 760px;
   background: rgba(15, 15, 15, 0.25);
   backdrop-filter: blur(2px);
   padding: 35px;
@@ -358,20 +358,50 @@ button.active {
 
 .slider-row input[type="range"] {
   flex: 1;
+  min-width: 0;
+  width: auto;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   cursor: pointer;
-  height: 8px;
+  vertical-align: middle;
+  color-scheme: dark;
+  accent-color: rgb(155, 155, 155);
+  appearance: auto;
+  -webkit-appearance: slider-horizontal;
+}
+
+.slider-row input[type="range"]:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 1);
+  outline-offset: 3px;
 }
 
 .value-input {
   width: 95px;
   height: 36px;
   background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 1);
   border-radius: 6px;
   color: #fff;
+  caret-color: #fff;
+  accent-color: rgba(0, 0, 0, 0.4);
   text-align: center;
   font-size: 1rem;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.value-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4);
+}
+
+.value-input::selection {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .value-input::-webkit-outer-spin-button,
@@ -474,8 +504,9 @@ canvas {
 
   #settings {
     box-sizing: border-box;
-    width: calc(100% - 24px);
+    width: calc(100% - 40px);
     height: calc(100% - 24px);
+    max-width: 760px;
     padding: 20px 16px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
