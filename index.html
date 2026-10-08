@@ -3068,7 +3068,10 @@ function drawBg(CTX = ctx, CANVAS = canvas) {
 
  ctx.lineJoin = "round";
   const baseY = canvas.height / 2 + 15;
-  const offsets = [-540, 0, 540, 1080]; 
+ const offsets = [];
+ for (let offset = -540; offset < canvas.width; offset += 540) {
+   offsets.push(offset);
+ }
 
   for (let offset of offsets) {
     for (let m of mountainData) {
