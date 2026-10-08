@@ -2215,6 +2215,7 @@ drawTo.push([b1.x, b1.x, balls.indexOf(b2)])
         //stopgame
         update();
         document.addEventListener('keydown', (event) => {
+        if (event.repeat && ['a', 'e', 'l', 's'].includes(event.key.toLowerCase())) return;
        
         if (event.key === 'z') {
         zoom += 0.5
@@ -2378,10 +2379,6 @@ spawnDummy(true)
             if (event.key === 'f') {
                
                 fullscrean()
-            }
-            if (event.key === 'e') {
-               
-                explode()
             }
             if (event.key === 'x') {
                
