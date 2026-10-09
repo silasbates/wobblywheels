@@ -789,8 +789,8 @@ let mapId = 0;
 let maps = [
 //normal
 {name: "normal", insideColor: '#888', surfaceColor: "#222",
-thickness: 5,  waterColor: '#23537d', grassColor: "#6cde41",  
-sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd060",
+thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
+sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true,
 friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999 },
 
@@ -798,7 +798,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999 },
 
 
 //ice
-{name: "ice", insideColor: '#88F', surfaceColor: "#6EF",
+{name: "ice", insideColor: '#CCF', surfaceColor: "#9DF",
 thickness: 5, waterColor: '#AEF', grassColor: 'white', 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#ddd', 
 mountainColors: ["white", "#dde", "ddf", "#ccF", "ddF"], drawShore: false,
@@ -3200,7 +3200,7 @@ function drawBg(CTX = ctx, CANVAS = canvas) {
   skyGradient.addColorStop(0, m.skyColor);
   //skyGradient.addColorStop(0.4, "#73aed9");
   //skyGradient.addColorStop(0.75, "#f79e45");
-  skyGradient.addColorStop(0.7, m.sunsetColor);
+  skyGradient.addColorStop(0.85, m.sunsetColor);
   skyGradient.addColorStop(1, m.sunsetColor);
   ctx.fillStyle = skyGradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
