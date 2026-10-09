@@ -1482,7 +1482,7 @@ const x = (canvas.width / 2) - 230;
 const y = 50;
 const text1 = "SURVIVAL CHANCE:";
 const text2 = `${survivalChance}%`;
-
+const text3 = `Distance: ${Math.floor(balls[26].x / 100)}`;
 ctx.font = `italic 900 ${size}px "Arial Black", Impact, sans-serif`;
 const w1 = ctx.measureText(text1).width;
 
@@ -1499,6 +1499,13 @@ ctx.textAlign = "center";
 ctx.textBaseline = "top";
 ctx.lineJoin = "round";
 ctx.miterLimit = 2;
+
+ctx.font = `italic 900 ${size * 0.55}px "Arial Black", Impact, sans-serif`;
+ctx.strokeStyle = "#FFFFFF";
+ctx.lineWidth = 3;
+ctx.strokeText(text3, x + (boxWidth / 2), y - (size * 0.45));
+ctx.fillStyle = "#000000";
+ctx.fillText(text3, x + (boxWidth / 2), y - (size * 0.45));
 
 ctx.font = `italic 900 ${size}px "Arial Black", Impact, sans-serif`;
 ctx.strokeStyle = "#FFFFFF";
@@ -2267,9 +2274,8 @@ if (ball1.snow && Math.random() > 0.5 && !ball2.snow) {
     const distOfPoints = getDistance(b1.x, b1.y, b2.x, b2.y);
     let snapThreshold = springSnap;
     let bendThreshold = bendPoint;
-    if (balls.indexOf(b1) < wheel2[1]) {snapThreshold *= 3  }
+    if (b1.color === "black" && b2.color === "black") {snapThreshold *= 5; bendThreshold *= 5}
     
-    if (balls.indexOf(b1) < wheel2[1]) {bendThreshold *= 3  }
 const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || (pair[0] === b2 && pair[1] === b1));
     const dx = b1.x - b2.x;
     const dy = b1.y - b2.y;
@@ -3338,7 +3344,6 @@ drawingInput = 'drive'
     </script>
 </body> 
 </html>
-
 
 
 
