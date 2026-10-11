@@ -136,7 +136,11 @@ margin: 0.5px;
   
         }
         
+        #menuBtn {
+        font-size: 1.5rem;
         
+        
+        }
         
 button {
   flex: 1;
@@ -229,8 +233,26 @@ button.active {
   align-items: center;
   justify-content: center;
   text-align: center;
+  margin: 2px;
+  width: 100%;
 }
-
+#levelButton {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  padding: 16px 50px;
+  font-size: 1.6rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  text-transform: lowercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin: 3px;
+  width: 100%;
+}
 #playButton:hover {
   background: rgba(255, 255, 255, 0.35);
 }
@@ -511,6 +533,15 @@ canvas {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
+  #levels {
+    box-sizing: border-box;
+    width: calc(100% - 40px);
+    height: calc(100% - 24px);
+    max-width: 760px;
+    padding: 20px 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
   .tabs-header {
     gap: 6px;
@@ -550,6 +581,70 @@ canvas {
   }
 }
 
+
+
+
+
+
+
+
+
+#levels {
+  pointer-events: auto;
+  display: none; /* Controlled by OpenMenu() function */
+  flex-direction: column !important; /* Forces layout to stack grid on top of footer */
+  justify-content: flex-start;
+  align-items: center;
+  width: 84%;
+  height: 90%;
+  max-width: 760px;
+  background: rgba(15, 15, 15, 0.25);
+  backdrop-filter: blur(2px);
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  box-sizing: border-box;
+}
+
+.levels-grid {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.levelBtn {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  /*padding: 0 12px;*/
+  font-size: 1.5rem;
+  cursor: pointer;
+  border-radius: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 80px;
+  width: 80px;
+}
+
+.activeLevelBtn {
+
+  background: rgba(0, 100, 255, 0.3);
+}
+
+
+
+
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -577,10 +672,8 @@ canvas {
         <span class="slider round"></span>
     </label>
   
-    <button class="drawing" onclick="openSettingsMenu()">menu</button>
+    <button id='menuBtn' class="drawing" onclick="openHomeMenu()">☰</button>
     <button class="drawing" onclick="makeCar()">reset</button>
-    <button class="drawing" onclick="changeMap()">+level</button>
-    <button class="drawing" onclick="makeMap()">remake map</button>
     <button class="drawing" onclick="newCarColor()">car color</button>
     <button id="fullscrean" class="drawing" onclick="fullscrean()">⛶</button>
   
@@ -641,10 +734,149 @@ canvas {
       <div id="home">
         <h1>Wobbly Wheels</h1>
         
-        <button id="playButton" onclick="OpenMenu('settings')">Play</button>
+        <button id="levelButton" onclick="OpenMenu('levels')">Play</button>
+        <button id="playButton" onclick="OpenMenu('settings')">Sanbox</button>
+        
       </div>
       
       <div id="settings" style="display: none;">
+        <div class="tabs-header">
+          <button class="tab-btn active" id="tab-physics" onclick="OpenSubSection('physics')">car physics</button>
+          <button class="tab-btn" id="tab-map" onclick="OpenSubSection('map')">map Gen</button>
+          <button class="tab-btn" id="tab-events" onclick="OpenSubSection('events')">events</button>
+        </div>
+
+        <div class="tab-content" id="physics-content">
+          <div class="setting-group">
+            <span class="instruction-text">select one:</span>
+            <div class="radio-group">
+              <button id="btn-jelly" class="preset-btn" onclick="SetPreset('jelly')">Jelly</button>
+              <button id="btn-realistic" class="preset-btn selected" onclick="SetPreset('realistic')">Realistic</button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label class="slider-label">jellyness</label>
+            <div class="slider-row">
+              <input type="range" id="stiffnessSlider" min="0.00001" max="0.999999" step="0.00001" value="1" oninput="SyncFromSlider('stiffness', this.value)">
+              <input type="number" id="stiffness-val" class="value-input" min="0.00001" max="0.999999" step="0.00001" value="1" onchange="SyncFromInput('stiffness', this.value)">
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label class="slider-label">bounce</label>
+            <div class="slider-row">
+              <input type="range" id="restitutionSlider" min="0.00001" max="0.999999" step="0.00001" value="0.00001" oninput="SyncFromSlider('restitution', this.value)">
+              <input type="number" id="restitution-val" class="value-input" min="0.00001" max="0.999999" step="0.00001" value="0.00001" onchange="SyncFromInput('restitution', this.value)">
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label class="slider-label">friction</label>
+            <div class="slider-row">
+              <input type="range" id="frictionSlider" min="0.00001" max="0.999999" step="0.00001" value="1" oninput="SyncFromSlider('friction', this.value)">
+              <input type="number" id="friction-val" class="value-input" min="0.00001" max="0.999999" step="0.00001" value="1" onchange="SyncFromInput('friction', this.value)">
+            </div>
+          </div>
+          
+          <div class="setting-group">
+            <label class="slider-label">brittleness</label>
+            <div class="slider-row">
+              <input type="range" id="brittlenessSlider" min="1.0" max="20.0" step="0.1" value="4" oninput="SyncFromSlider('brittleness', this.value)">
+              <input type="number" id="brittleness-val" class="value-input" min="1.0" max="20.0" step="0.1" value="4" onchange="SyncFromInput('brittleness', this.value)">
+            </div>
+          </div>
+          
+          
+          
+        </div>
+
+        <div class="tab-content" id="map-content" style="display: none;">
+          <div class="setting-group">
+            <label class="slider-label">steepness</label>
+            <div class="slider-row">
+              <input type="range" id="steepnessSlider" min="0" max="1000" step="1" value="500" oninput="SyncFromSlider('steepness', this.value)">
+              <input type="number" id="steepness-val" class="value-input" min="0" max="1000" step="1" value="500" onchange="SyncFromInput('steepness', this.value)">
+            </div>
+          </div>
+
+          <div class="setting-group" style="display: none;">
+            <label class="slider-label">map step</label>
+            <div class="slider-row">
+              <input type="range" id="mapStepSlider" min="100" max="300" step="1" value="200" oninput="SyncFromSlider('mapStep', this.value)">
+              <input type="number" id="mapStep-val" class="value-input" min="100" max="300" step="1" value="200" onchange="SyncFromInput('mapStep', this.value)">
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="blank-content" style="display: none;">
+          <h1>Events</h1>
+          
+          
+          
+          <div class="setting-group">
+            <label class="slider-label">Rain</label>
+            <div class="slider-row">
+              <input type="range" id="rainSlider" min="0" max="10" step="0.01" value="3" oninput="SyncFromSlider('rain', this.value)">
+              <input type="number" id="rain-val" class="value-input" min="0.01" max="10" step="0" value="3" onchange="SyncFromInput('rain', this.value)">
+              <h2>%</h2>
+            </div>
+          </div>
+          
+          <div class="setting-group">
+            <label class="slider-label">Lightning (while raining)</label>
+            <div class="slider-row">
+              <input type="range" id="lightningSlider" min="0" max="10" step="0.01" value="3" oninput="SyncFromSlider('lightning', this.value)">
+              <input type="number" id="lightning-val" class="value-input" min="0.01" max="10" step="0" value="3" onchange="SyncFromInput('lightning', this.value)">
+              <h2>%</h2>
+            </div>
+          </div>
+          
+          <div class="setting-group">
+            <label class="slider-label">Astroid</label>
+            <div class="slider-row">
+              <input type="range" id="astroidSlider" min="0" max="10" step="0.01" value="3" oninput="SyncFromSlider('astroid', this.value)">
+              <input type="number" id="astroid-val" class="value-input" min="0.01" max="10" step="0" value="3" onchange="SyncFromInput('astroid', this.value)">
+              <h2>%</h2>
+            </div>
+          </div>
+          
+          <div class="setting-group">
+            <label class="slider-label">avalanche</label>
+            <div class="slider-row">
+              <input type="range" id="avalancheSlider" min="0" max="10" step="0.01" value="3" oninput="SyncFromSlider('avalanche', this.value)">
+              <input type="number" id="avalanche-val" class="value-input" min="0.01" max="10" step="0" value="3" onchange="SyncFromInput('avalanche', this.value)">
+              <h2>%</h2>
+            </div>
+          </div>
+          
+          
+          
+          <div class="setting-group">
+            <label class="slider-label">explode (When you crash)</label>
+            <div class="slider-row">
+              <input type="range" id="explodeSlider" min="0" max="10" step="0.01" value="3" oninput="SyncFromSlider('explode', this.value)">
+              <input type="number" id="explode-val" class="value-input" min="0.01" max="10" step="0" value="3" onchange="SyncFromInput('explode', this.value)">
+              <h2>%</h2>
+            </div>
+          </div>
+          
+          
+          </div>
+          
+          
+          
+        
+		
+      
+        
+        <div class="action-footer">
+          <button class="back-btn" onclick="OpenMenu('home')">Back</button>
+          <button class="settings-play-btn" onclick="StartGameplay()">Play</button>
+          
+        </div>
+      </div>
+<div id="settings" style="display: none;">
         <div class="tabs-header">
           <button class="tab-btn active" id="tab-physics" onclick="OpenSubSection('physics')">car physics</button>
           <button class="tab-btn" id="tab-map" onclick="OpenSubSection('map')">map Gen</button>
@@ -772,10 +1004,28 @@ canvas {
 
         <div class="action-footer">
           <button class="back-btn" onclick="OpenMenu('home')">Back</button>
-          <button class="settings-play-btn" onclick="StartGameplay()">Play</button>
+          <button class="settings-play-btn" onclick="startSanbox()">Play</button>
         </div>
       </div>
-      
+      <div id="levels" style="display: none;">
+                  <div class="levels-grid ">
+          <button onclick="pickLevel(1, false, this)" class='levelBtn activeLevelBtn'>1</button>
+          <button onclick="pickLevel(2, false, this)" class='levelBtn'>2</button>
+          <button onclick="pickLevel(3, false, this)" class='levelBtn'>3</button>
+          <button onclick="pickLevel(4, false, this)" class='levelBtn'>4</button>
+        </div>
+
+          
+          
+          
+          	<div class="action-footer">
+          <button class="back-btn" onclick="OpenMenu('home')">Back</button>
+          
+          <button class="settings-play-btn" onclick="startLevel()">Play</button>
+          
+        </div>
+          
+        </div>
     </div>
   </div>
 </div>
@@ -795,10 +1045,17 @@ mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawSho
 friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999 },
 
 
+//jellow
+{name: "jello", insideColor: "rgba(255, 0, 0, 0.5)", surfaceColor: "rgba(255, 0, 0, 0.75)", 
+thickness: 5, waterColor: '#AEF', grassColor: "rgba(155, 255, 0, 0.5)", 
+sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#eed', 
+mountainColors: ["rgba(255, 0, 0, 0.5)", "rgba(155, 255, 0, 0.5)", "rgba(255, 255, 0, 0.5)", "rgba(255, 0, 255, 0.5)", "rgba(0, 255, 255, 0.5)"], drawShore: false,
+friction: 1, restitution: 0, springSnap: 8, stiffness: 0.3 },
+
 
 
 //ice
-{name: "ice", insideColor: '#CCF', surfaceColor: "#9DF",
+{name: "ice", insideColor: '#CCC', surfaceColor: "#9DF",
 thickness: 5, waterColor: '#AEF', grassColor: 'white', 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#ddd', 
 mountainColors: ["white", "#dde", "ddf", "#ccF", "ddF"], drawShore: false,
@@ -809,7 +1066,7 @@ friction: 0.3, restitution: 0, springSnap: 5, stiffness: 0.99999 },
 
 
 //snow
-{name: "snow", insideColor: '#ddf', surfaceColor: "white", 
+{name: "snow", insideColor: '#CCC', surfaceColor: "white", 
 thickness: 100, waterColor: '#AEF', grassColor: '#eee', 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#ddd', 
 mountainColors: ["white", "#dde", "ddf", "#ccF", "ddF"], drawShore: false,
@@ -818,13 +1075,6 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999 },
 
 
 
-
-//jellow
-{name: "jello", insideColor: "rgba(255, 0, 0, 0.5)", surfaceColor: "rgba(255, 0, 0, 0.75)", 
-thickness: 5, waterColor: '#AEF', grassColor: "rgba(155, 255, 0, 0.5)", 
-sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#eed', 
-mountainColors: ["rgba(255, 0, 0, 0.5)", "rgba(155, 255, 0, 0.5)", "rgba(255, 255, 0, 0.5)", "rgba(255, 0, 255, 0.5)", "rgba(0, 255, 255, 0.5)"], drawShore: false,
-friction: 1, restitution: 0, springSnap: 8, stiffness: 0.3 }
 
 
 
@@ -905,6 +1155,35 @@ function toggleRain() {
 	isRaining = !isRaining
 }
 
+function pickLevel(levelIn, play = true, levelBtn = false) {
+    mapId = levelIn - 1
+    if (play) {
+        StartGameplay() 
+        makeCar()
+    }
+    
+    levels = true
+    if (levelBtn) {
+        let buttonClassName = 'activeLevelBtn'
+        const activeElements = document.querySelectorAll('.' + buttonClassName);
+        
+        activeElements.forEach(element => {
+            element.classList.remove(buttonClassName);
+        });
+        
+        levelBtn.classList.add(buttonClassName);
+    }
+}
+
+
+function startLevel(levelIn, play = true) {
+	
+    	StartGameplay() 
+        makeCar()
+    
+    levels = true
+    
+}
 
 
 
@@ -956,16 +1235,27 @@ function OpenMenu(menu = 'home') {
   const overlayUi = document.getElementById('overlay-ui');
   const homeEl = document.getElementById('home');
   const settingsEl = document.getElementById('settings');
+  
+  const levelsEl = document.getElementById('levels');
 
   if (overlayUi) overlayUi.style.background = "rgba(0, 0, 0, 0.2)";
   if (homeEl) homeEl.style.display = 'none';
   if (settingsEl) settingsEl.style.display = 'none';
+  
+  if (levelsEl) levelsEl.style.display = 'none';
 
   if (menu === 'home' && homeEl) {
     homeEl.style.display = 'flex';
   } else if (menu === 'settings' && settingsEl) {
     settingsEl.style.display = 'flex';
+  } else if (menu === 'levels' && levelsEl) {
+    levelsEl.style.display = 'flex';
   }
+}
+
+function startSanbox() {
+	StartGameplay()
+    levels = false
 }
 
 function OpenSubSection(section) {
@@ -1030,10 +1320,13 @@ running = true
   const overlayUi = document.getElementById('overlay-ui');
   const homeEl = document.getElementById('home');
   const settingsEl = document.getElementById('settings');
+  
+  const levelsEl = document.getElementById('levels');
 
   if (homeEl) homeEl.style.display = 'none';
   if (settingsEl) settingsEl.style.display = 'none';
   if (overlayUi) overlayUi.style.background = "none";
+  if (levelsEl) levelsEl.style.display = "none";
 }
 
 function SyncFromSlider(key, val) {
@@ -1112,9 +1405,9 @@ function updateGlobalState(key, value) {
  
 }
 
-function openSettingsMenu() {
+function openHomeMenu() {
   running = false; 
-  OpenMenu('settings');
+  OpenMenu('home');
 }
 
 
@@ -2276,6 +2569,7 @@ if (ball1.snow && Math.random() > 0.5 && !ball2.snow) {
     let bendThreshold = bendPoint;
     if (b1.color === "black" && b2.color === "black") {snapThreshold *= 5; bendThreshold *= 5}
     
+    if (balls.indexOf(b1) < wheel2[1]) {bendThreshold *= 3  }
 const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || (pair[0] === b2 && pair[1] === b1));
     const dx = b1.x - b2.x;
     const dy = b1.y - b2.y;
@@ -2639,7 +2933,7 @@ function makeCar() {
 fireChance = Math.random() * 67
 yourChance = Math.random() * 100
 snapped = 0
-
+makeMap()
 target = 26
 oof = false
 fire = false
@@ -3344,6 +3638,11 @@ drawingInput = 'drive'
     </script>
 </body> 
 </html>
+
+
+
+
+
 
 
 
