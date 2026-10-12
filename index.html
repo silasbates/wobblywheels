@@ -1049,6 +1049,8 @@ canvas {
           <button onclick="pickLevel(7, false, this)" class='levelBtn'>7</button>
           
           <button onclick="pickLevel(8, false, this)" class='levelBtn'>8</button>
+          
+          <button onclick="pickLevel(9, false, this)" class='levelBtn'>9</button>
         </div>
       <p class="gray" > More Coming Soon!</p>
           
@@ -1068,6 +1070,9 @@ canvas {
 
 
 <script>
+  let noGravityTime = 50;
+  let noGravity = 0;
+  let zeroGravitySkyBlend = 0;
 let offset = 50
 let stickAmount = 15
 	let deadChance = 1.25
@@ -1125,12 +1130,20 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,  c
 
 
 //hyper gravity
-  {title: "Hyper Gravity", name: "moon", insideColor: '#555', surfaceColor: "#36F",
+  {title: "Hyper Gravity", name: "hyper gravity", insideColor: '#555', surfaceColor: "#36F",
 thickness: 5,  waterColor: false, grassColor: "#446",  
-sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
+sandColor: "#f6d597", skyColor: "#32104f", sunsetColor: "#8a3db5",
 mountainColors: ["#44F", "gray", "#77F", "#60676b", "#11F"], drawShore: false, drawSun: false,
 friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.4, carColor: 'blue'},
 
+
+
+//Zero Gravity 
+  {title: "Zero Gravity", name: "zero gravity", insideColor: '#555', surfaceColor: "#a020f0",
+thickness: 5,  waterColor: false, grassColor: "#46265f",  
+sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
+mountainColors: ["#b45cff", "#8050a5", "#d19aff", "#60676b", "#9228df"], drawShore: false, drawSun: false,
+friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2, carColor: 'red'},
 
 
 
@@ -1238,6 +1251,7 @@ function toggleRain() {
 function pickLevel(levelIn, play = true, levelBtn = false) {
 	
     mapId = levelIn - 1
+    noGravity = 0
     if (play) {
         StartGameplay() 
         makeCar()
@@ -1802,13 +1816,20 @@ function update() {
         b.x += b.xVel;
         b.y += b.yVel;
         let hasTouched = false;
+        let hasTouchedGround = false;
         for (let line of level) {
             if (touchingLine(b, line)) {
                 bounce(b, line);
                 hasTouched = true;
+                const lineIndex = level.indexOf(line);
+                hasTouchedGround = lineIndex > 4 && lineIndex < dirtIndex;
                 break;
             }
         }
+        if (m.name === "zero gravity" && balls.indexOf(b) < 43 && hasTouchedGround && !b.wasOnGround) {
+            noGravity = noGravityTime;
+        }
+        b.wasOnGround = hasTouchedGround;
        
 if (b.anchor) {
             ctx.fillStyle = "red"
@@ -1837,7 +1858,7 @@ if (b.anchor) {
             }
 }*/
        
-        if (!hasTouched && getInput('gravity')) {
+        if (!hasTouched && noGravity <= 0 && getInput('gravity')) {
             b.yVel += gravity;
             //b.xVel += Xgravity;
         }
@@ -2041,6 +2062,9 @@ ctx.lineWidth = Zoom(m.thickness)
         ctx.stroke();
     }
 
+    if (noGravity > 0) {
+        noGravity--;
+    }
     requestAnimationFrame(update);
 }  
 
@@ -3076,6 +3100,7 @@ function scroll() {
      
 zoom = 1
 function makeCar() {
+noGravity = 0
 fireChance = Math.random() * 67
 yourChance = Math.random() * 100
 snapped = 0
@@ -3641,11 +3666,25 @@ function drawBg(CTX = ctx, CANVAS = canvas) {
 
   // sky
   let skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
-  skyGradient.addColorStop(0, m.skyColor);
+  const isZeroGravitySky = m.name === "zero gravity";
+  const targetSkyBlend = isZeroGravitySky && noGravity > 0 ? 1 : 0;
+  zeroGravitySkyBlend += (targetSkyBlend - zeroGravitySkyBlend) * 0.06;
+  const blendSkyColor = (baseColor, purpleColor) => {
+    const base = Number.parseInt(baseColor.slice(1), 16);
+    const purple = Number.parseInt(purpleColor.slice(1), 16);
+    const channel = shift => Math.round(
+      ((base >> shift) & 255) * (1 - zeroGravitySkyBlend) +
+      ((purple >> shift) & 255) * zeroGravitySkyBlend
+    );
+    return `rgb(${channel(16)}, ${channel(8)}, ${channel(0)})`;
+  };
+  const skyColor = isZeroGravitySky ? blendSkyColor(m.skyColor, "#32104f") : m.skyColor;
+  const sunsetColor = isZeroGravitySky ? blendSkyColor(m.sunsetColor, "#8a3db5") : m.sunsetColor;
+  skyGradient.addColorStop(0, skyColor);
   //skyGradient.addColorStop(0.4, "#73aed9");
   //skyGradient.addColorStop(0.75, "#f79e45");
-  skyGradient.addColorStop(0.85, m.sunsetColor);
-  skyGradient.addColorStop(1, m.sunsetColor);
+  skyGradient.addColorStop(0.85, sunsetColor);
+  skyGradient.addColorStop(1, sunsetColor);
   ctx.fillStyle = skyGradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 		
