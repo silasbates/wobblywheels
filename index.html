@@ -7,7 +7,7 @@
     	#slider {
         	display: none;
         }
-        #snap {
+        #snap {`
         	display: none;
         }
         #gravity {
@@ -646,7 +646,7 @@ canvas {
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
   /*padding: 0 12px;*/
-  font-size: 1.5rem;
+  font-size: 2rem;
   cursor: pointer;
   border-radius: 12px;
   white-space: nowrap;
@@ -656,6 +656,7 @@ canvas {
   box-sizing: border-box;
   height: 80px;
   width: 80px;
+  font-weight: 1000;
 }
 
 .activeLevelBtn {
@@ -671,6 +672,14 @@ canvas {
 #levelName, #levelText {
 	margin: 0px;
 }
+
+
+
+
+h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
+    text-transform: capitalize !important;
+}
+
 
 
     </style>
@@ -759,7 +768,8 @@ canvas {
     <div id="overlay-ui">
       
       <div id="home">
-        <h1>Wobbly Wheels</h1>
+      <h1 style="text-transform: capitalize;">Wobbly Wheels</h1>
+
         
         <button id="levelButton" onclick="OpenMenu('levels')">Play</button>
         <button id="playButton" onclick="OpenMenu('settings')">Sanbox</button>
@@ -775,7 +785,7 @@ canvas {
 
         <div class="tab-content" id="physics-content">
           <div class="setting-group">
-            <span class="instruction-text">select one:</span>
+            <span class="instruction-text">Select One:</span>
             <div class="radio-group">
               <button id="btn-jelly" class="preset-btn" onclick="SetPreset('jelly')">Jelly</button>
               <button id="btn-realistic" class="preset-btn selected" onclick="SetPreset('realistic')">Realistic</button>
@@ -783,7 +793,7 @@ canvas {
           </div>
 
           <div class="setting-group">
-            <label class="slider-label">jellyness</label>
+            <label class="slider-label">Jellyness</label>
             <div class="slider-row">
               <input type="range" id="stiffnessSlider" min="0.00001" max="0.999999" step="0.00001" value="1" oninput="SyncFromSlider('stiffness', this.value)">
               <input type="number" id="stiffness-val" class="value-input" min="0.00001" max="0.999999" step="0.00001" value="1" onchange="SyncFromInput('stiffness', this.value)">
@@ -791,7 +801,7 @@ canvas {
           </div>
 
           <div class="setting-group">
-            <label class="slider-label">bounce</label>
+            <label class="slider-label">Bounce</label>
             <div class="slider-row">
               <input type="range" id="restitutionSlider" min="0.00001" max="0.999999" step="0.00001" value="0.00001" oninput="SyncFromSlider('restitution', this.value)">
               <input type="number" id="restitution-val" class="value-input" min="0.00001" max="0.999999" step="0.00001" value="0.00001" onchange="SyncFromInput('restitution', this.value)">
@@ -799,7 +809,7 @@ canvas {
           </div>
 
           <div class="setting-group">
-            <label class="slider-label">friction</label>
+            <label class="slider-label">Friction</label>
             <div class="slider-row">
               <input type="range" id="frictionSlider" min="0.00001" max="0.999999" step="0.00001" value="1" oninput="SyncFromSlider('friction', this.value)">
               <input type="number" id="friction-val" class="value-input" min="0.00001" max="0.999999" step="0.00001" value="1" onchange="SyncFromInput('friction', this.value)">
@@ -807,7 +817,7 @@ canvas {
           </div>
           
           <div class="setting-group">
-            <label class="slider-label">brittleness</label>
+            <label class="slider-label">Brittleness</label>
             <div class="slider-row">
               <input type="range" id="brittlenessSlider" min="1.0" max="20.0" step="0.1" value="4" oninput="SyncFromSlider('brittleness', this.value)">
               <input type="number" id="brittleness-val" class="value-input" min="1.0" max="20.0" step="0.1" value="4" onchange="SyncFromInput('brittleness', this.value)">
@@ -820,7 +830,7 @@ canvas {
 
         <div class="tab-content" id="map-content" style="display: none;">
           <div class="setting-group">
-            <label class="slider-label">steepness</label>
+            <label class="slider-label">Steepness</label>
             <div class="slider-row">
               <input type="range" id="steepnessSlider" min="0" max="1000" step="1" value="500" oninput="SyncFromSlider('steepness', this.value)">
               <input type="number" id="steepness-val" class="value-input" min="0" max="1000" step="1" value="500" onchange="SyncFromInput('steepness', this.value)">
@@ -828,7 +838,7 @@ canvas {
           </div>
 
           <div class="setting-group" style="display: none;">
-            <label class="slider-label">map step</label>
+            <label class="slider-label">Map Step</label>
             <div class="slider-row">
               <input type="range" id="mapStepSlider" min="100" max="300" step="1" value="200" oninput="SyncFromSlider('mapStep', this.value)">
               <input type="number" id="mapStep-val" class="value-input" min="100" max="300" step="1" value="200" onchange="SyncFromInput('mapStep', this.value)">
@@ -869,7 +879,7 @@ canvas {
           </div>
           
           <div class="setting-group">
-            <label class="slider-label">avalanche</label>
+            <label class="slider-label">Avalanche</label>
             <div class="slider-row">
               <input type="range" id="avalancheSlider" min="0" max="10" step="0.01" value="3" oninput="SyncFromSlider('avalanche', this.value)">
               <input type="number" id="avalanche-val" class="value-input" min="0.01" max="10" step="0" value="3" onchange="SyncFromInput('avalanche', this.value)">
@@ -880,7 +890,7 @@ canvas {
           
           
           <div class="setting-group">
-            <label class="slider-label">explode (When you crash)</label>
+            <label class="slider-label">Explode (When you crash)</label>
             <div class="slider-row">
               <input type="range" id="explodeSlider" min="0" max="10" step="0.01" value="3" oninput="SyncFromSlider('explode', this.value)">
               <input type="number" id="explode-val" class="value-input" min="0.01" max="10" step="0" value="3" onchange="SyncFromInput('explode', this.value)">
@@ -1047,16 +1057,17 @@ canvas {
           <button onclick="pickLevel(5, false, this)" class='levelBtn'>5</button>
           <button onclick="pickLevel(6, false, this)" class='levelBtn'>6</button>
           <button onclick="pickLevel(7, false, this)" class='levelBtn'>7</button>
-          
           <button onclick="pickLevel(8, false, this)" class='levelBtn'>8</button>
-          
           <button onclick="pickLevel(9, false, this)" class='levelBtn'>9</button>
-          
           <button onclick="pickLevel(10, false, this)" class='levelBtn'>10</button>
-          
           <button onclick="pickLevel(11, false, this)" class='levelBtn'>11</button>
-          
           <button onclick="pickLevel(12, false, this)" class='levelBtn'>12</button>
+          <button onclick="pickLevel(13, false, this)" class='levelBtn'>13</button>
+          <button onclick="pickLevel(14, false, this)" class='levelBtn'>14</button>
+          <button onclick="pickLevel(15, false, this)" class='levelBtn'>15</button>
+          <button onclick="pickLevel(16, false, this)" class='levelBtn'>16</button>
+        
+          
         </div>
       <p class="gray" > More Coming Soon!</p>
           
@@ -1076,6 +1087,7 @@ canvas {
 
 
 <script>
+	let sanboxMode  = false
   let noGravityTime = 50;
   let noGravity = 0;
   let zeroGravitySkyBlend = 0;
@@ -1083,6 +1095,7 @@ let offset = 50
 let stickAmount = 15
 	let deadChance = 1.25
     let carPuff = 1
+    let wheelPuff = 1
   
 let levels = true;
 let mapId = 0;
@@ -1092,7 +1105,16 @@ let maps = [
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "red", carSize: 1},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "red", carSize: 1, wheelSize: 1, steep: 500},
+
+
+
+//Green Hills
+{title: "Green Hills", name: "green hills", insideColor: '#520', surfaceColor: "lime",
+thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
+sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
+mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
+friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.2  , carColor: "red", carSize: 1, wheelSize: 1, steep: 0},
 
 
 //jello
@@ -1100,7 +1122,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , 
 thickness: 5, waterColor: '#AEF', grassColor: "rgba(155, 255, 0, 0.5)", 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#eed', 
 mountainColors: ["rgba(255, 0, 0, 0.5)", "rgba(155, 255, 0, 0.5)", "rgba(255, 255, 0, 0.5)", "rgba(255, 0, 255, 0.5)", "rgba(0, 255, 255, 0.5)"], drawShore: false, drawSun: true,
-friction: 1, restitution: 0, springSnap: 8, stiffness: 0.3, gravity: 0.2  , carColor: "rgba(255, 0, 0, 0.5)", carSize: 1},
+friction: 1, restitution: 0, springSnap: 8, stiffness: 0.3, gravity: 0.2  , carColor: "rgba(255, 0, 0, 0.5)", carSize: 1, wheelSize: 1, steep: 500},
 
 
 
@@ -1109,7 +1131,7 @@ friction: 1, restitution: 0, springSnap: 8, stiffness: 0.3, gravity: 0.2  , carC
 thickness: 5, waterColor: '#AEF', grassColor: 'white', 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#ddd', 
 mountainColors: ["white", "#dde", "ddf", "#ccF", "ddF"], drawShore: false, drawSun: true,
-friction: 0.3, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,  carColor: "brown", carSize: 1},
+friction: 0.3, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,  carColor: "brown", carSize: 1, wheelSize: 1, steep: 500},
 
 
 
@@ -1120,7 +1142,7 @@ friction: 0.3, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2, 
 thickness: 100, waterColor: '#AEF', grassColor: '#eee', 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#ddd', 
 mountainColors: ["white", "#dde", "ddf", "#ccF", "ddF"], drawShore: false, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2, carColor: "brown", carSize: 1},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2, carColor: "brown", carSize: 1, wheelSize: 1, steep: 500},
 
 
 
@@ -1132,7 +1154,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2, ca
 thickness: 5, waterColor: '#AEF', grassColor: "rgba(155, 255, 0, 0.5)", 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#eed', 
 mountainColors: ["rgba(255, 0, 0, 0.5)", "rgba(155, 255, 0, 0.5)", "rgba(255, 255, 0, 0.5)", "rgba(255, 0, 255, 0.5)", "rgba(0, 255, 255, 0.5)"], drawShore: false, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,  carColor: "yellow", carSize: 1},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,  carColor: "yellow", carSize: 1, wheelSize: 1, steep: 500},
 
 
 
@@ -1141,7 +1163,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,  c
 thickness: 5,  waterColor: false, grassColor: "#446",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#44F", "gray", "#77F", "#60676b", "#11F"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.4, carColor: 'blue', carSize: 1},
+friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.4, carColor: 'blue', carSize: 1, wheelSize: 1, steep: 500},
 
 
 
@@ -1154,7 +1176,7 @@ friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.4, carCo
 thickness: 5,  waterColor: false, grassColor: "gray",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.08, carColor: 'white', carSize: 1},
+friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.08, carColor: 'white', carSize: 1, wheelSize: 1, steep: 500},
 
 
 
@@ -1167,7 +1189,7 @@ friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.08, c
 thickness: 5,  waterColor: false, grassColor: "#f60",  
 sandColor: "#f6d597", skyColor: "#aaa", sunsetColor: "gray",
 mountainColors: ["orange", "red", "#f90", "#f60", "F50"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2, windX: 0.12, carColor: 'white', carSize: 1},
+friction: 1, restitution: 0, springSnap: 4, stiffness: 0.99999, gravity: 0.2, windX: 0.12, carColor: 'white', carSize: 1, wheelSize: 1, steep: 500},
 
 
 
@@ -1176,7 +1198,7 @@ friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2, windX
 thickness: 5,  waterColor: false, grassColor: "#469f46",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#b4ffb4", "#0f0", "#0f0", "#60676b", "#928f92"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2, carColor: 'green', carSize: null},
+friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2, carColor: 'green', carSize: null, wheelSize: 1, steep: 500},
 
 
 
@@ -1185,7 +1207,7 @@ friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2, carCo
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "maroon", carSize: 1.45},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "maroon", carSize: 1.45, wheelSize: 1, steep: 500},
 
 
 
@@ -1194,17 +1216,53 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , 
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "#f99", carSize: 0.9},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "#f99", carSize: 0.9, wheelSize: 1, steep: 500},
+
+
+
+
+
+
+
+
+
+
+
+
+//tiny wheels
+{title: "Tiny Wheels", name: "tiny wheels", insideColor: '#888', surfaceColor: "#222",
+thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
+sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
+mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "red", carSize: 1, wheelSize: 0.75, steep: 500},
+
+
+
+
+//big wheels
+{title: "Big Wheels", name: "big wheels", insideColor: '#888', surfaceColor: "#222",
+thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
+sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
+mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "red", carSize: 1, wheelSize: 1.3, steep: 500},
+
 
 //Zero Gravity 
   {title: "Zero Gravity", name: "zero gravity", insideColor: '#555', surfaceColor: "#a020f0",
 thickness: 5,  waterColor: false, grassColor: "#46265f",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#b45cff", "#8050a5", "#d19aff", "#60676b", "#9228df"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2, carColor: 'purple', carSize: 1},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2, carColor: 'purple', carSize: 1, wheelSize: 1, steep: 500},
 
 
 
+
+//neptune
+  {title: "Neptune", name: "neptune", insideColor: '#33a', surfaceColor: "#36F",
+thickness: 5,  waterColor: false, grassColor: "#446",  
+sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
+mountainColors: ["#44F", "11F", "#77F", "#33F", "#11F"], drawShore: false, drawSun: false,
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2, carColor: 'blue', carSize: 1, wheelSize: 1, steep: 500},
 
 
 
@@ -1351,11 +1409,15 @@ let inputExplode = 3;
  
 function applySettings() {
 	if (levels) {
+    	
         if (m.carColor) {
     		carColor = m.carColor
         }
         if (m.carSize) {
         	carPuff +=  (m.carSize - carPuff) / 7
+        }
+        if (m.wheelSize) {
+        	wheelPuff +=  (m.wheelSize - wheelPuff) / 7
         }
 		DStiffness = m.stiffness
     	restitution = m.restitution
@@ -1366,6 +1428,8 @@ function applySettings() {
         	friction = Math.max(m.friction, 0.7)
         }
         gravity = m.gravity
+        
+   		mapSteepness = m.steep
     } else {
     	DStiffness = inputStiffness
     	restitution = inputRestitution
@@ -1403,8 +1467,11 @@ function OpenMenu(menu = 'home') {
 }
 
 function startSanbox() {
-	StartGameplay()
+	
+    
+    StartGameplay()
     levels = false
+    
 }
 
 function OpenSubSection(section) {
@@ -1642,11 +1709,57 @@ let driveRight = false
 
 
 
+let neptuneWind = 0
+function drawNeptuneWinds() {
+    let canvasWidth = canvas.width;
+    let canvasHeight = canvas.height;
 
+    if (!this.windParticles) {
+        this.windParticles = [];
+        for (let i = 0; i < 250; i++) {
+            this.windParticles.push({
+                x: Math.random() * canvasWidth,
+                y: Math.random() * canvasHeight,
+                length: Math.random() * 500 + 300,
+                speed: Math.random() * 60 + 40,
+                opacity: Math.random() * 0.6 + 0.4,
+                thickness: Math.random() * 8 + 4
+            });
+        }
+    }
 
+    let sineIntensity = (Math.sin(time * 0.02) + 1) / 2;
+	neptuneWind = sineIntensity
+    if (sineIntensity > 0.01) {
+        let totalBlockAlpha = sineIntensity >= 0.98 ? 1.0 : sineIntensity * 0.75;
+        ctx.fillStyle = `rgba(0, 45, 115, ${totalBlockAlpha})`;
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+        for (let i = 0; i < this.windParticles.length; i++) {
+            let p = this.windParticles[i];
+            
+            let gradient = ctx.createLinearGradient(p.x, p.y, p.x + p.length, p.y);
+            gradient.addColorStop(0, `rgba(30, 144, 255, 0)`);
+            gradient.addColorStop(0.3, `rgba(135, 206, 250, ${p.opacity * sineIntensity})`);
+            gradient.addColorStop(0.7, `rgba(255, 255, 255, ${p.opacity * 0.9 * sineIntensity})`);
+            gradient.addColorStop(1, `rgba(0, 102, 204, 0)`);
 
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = p.thickness;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.x + p.length, p.y);
+            ctx.stroke();
 
+            p.x += p.speed;
+
+            if (p.x > canvasWidth) {
+                p.x = -p.length;
+                p.y = Math.random() * canvasHeight;
+            }
+        }
+    }
+}
 
 
 
@@ -1818,8 +1931,10 @@ function update() {
         ctx.restore();
 
         
-        
-        
+         
+         if (m.name === "neptune") {
+    	drawNeptuneWinds();
+    }
         
         requestAnimationFrame(update);
         return;
@@ -1877,6 +1992,7 @@ function update() {
                 //spring(b, balls[s], b.springDist[b.spring.indexOf(s)]);
             }
         }
+        if (m.name === 'neptune') b.xVel += neptuneWind / 10
         b.x += b.xVel;
         b.y += b.yVel;
         let hasTouched = false;
@@ -1971,7 +2087,7 @@ if (b.anchor) {
         ctx.fill();
         }
     }
-let survivalChance = Math.exp(-0.075 * snapped) * 120;
+let survivalChance = Math.exp(-0.04 * snapped) * 110;
 if (survivalChance > 10) {
     survivalChance = Math.floor(survivalChance);
 } else {
@@ -2128,6 +2244,9 @@ ctx.lineWidth = Zoom(m.thickness)
 
     if (noGravity > 0) {
         noGravity--;
+    }
+    if (m.name === "neptune") {
+    	drawNeptuneWinds();
     }
     requestAnimationFrame(update);
 }  
@@ -2420,7 +2539,6 @@ function getInput(input) {
         let restitution = .1
         let friction = 1
         let isSpacePressed = false
-        
         let gravity = 0.2
         let hasFired = false
         let level = [{"x1":-50,"y1":1079,"x2":2710,"y2":1079},{"x1":5,"y1":0,"x2":5,"y2":1079},{"x1":2710,"y1":0,"x2":2710,"y2":1079},{"x1":0,"y1":0,"x2":2710,"y2":0},
@@ -2428,7 +2546,7 @@ function getInput(input) {
         function makeMap() {
             level = [{"x1":-50,"y1":1079,"x2":2710,"y2":1079},{"x1":5,"y1":0,"x2":5,"y2":1079},{"x1":2710,"y1":0,"x2":2710,"y2":1079},{"x1":0,"y1":0,"x2":2710,"y2":0},
         ]
-        let maxAngle = 500
+        let maxAngle = mapSteepness + 190
         let steep = mapSteepness
         let y = 300
         let lastX = -1500
@@ -2436,7 +2554,8 @@ function getInput(input) {
         let angle2 = 0
         let angleDown = false
         let step = mapStep
-        for (let x = 500; x < 50000; x += step) {
+        
+        for (let x = 500; x < 50000; x += 150) {
             if (steep > 2) {
                 maxAngle -= 3
                 steep--
@@ -2451,14 +2570,14 @@ function getInput(input) {
             let angle =  (Math.random() * maxAngle) - (maxAngle / (steep - 0))
            
            
-                angle2 += 2
+
                
                 if (angle2 > 250) angle2 -= (Math.random() * 150) + 100
                 if (maptype = 2) {
                     //angle = angle2
                  }  
-            if (y + angle < 150) {
-                y -= angle
+            if (true) {
+                y += angle
             } else {
                 y += angle
             }
@@ -2468,6 +2587,11 @@ function getInput(input) {
 
         }
         makeMap()
+
+
+
+
+
                 let dirtIndex =  level.length
 let copy = []
         let wheel1 = [0, 11]
@@ -2798,8 +2922,11 @@ if (ball1.snow && Math.random() > 0.5 && !ball2.snow) {
         if (balls.indexOf(b1) < 46) {
         	dist *= carPuff
         }
-        b1.scaled = b1.scaled || 1
-        b2.scaled = b2.scaled || 1
+        if (b1.color === 'black' && b2.color === 'black' && balls.indexOf(b1) < 46) {
+        	dist *= wheelPuff
+        }
+        b1.ogDist = b1.ogDist || b1.springDist
+        
 		let springIndex = index;
 
     const distOfPoints = getDistance(b1.x, b1.y, b2.x, b2.y);
@@ -2814,9 +2941,7 @@ const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || 
     
     
     if (distOfPoints > dist * snapThreshold ||
-    distOfPoints < dist * 1 / snapThreshold ||
-    b1.scaled > snapThreshold
-   /* b1.scaled < 1 / snapThreshold*/) {
+    distOfPoints < dist * 1 / snapThreshold) {
         if (!isHydrolic) {
                 b1.spring.splice(springIndex, 1);
                 b1.springDist.splice(springIndex, 1);
@@ -2833,15 +2958,12 @@ const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || 
 }
    
     }
-if (distOfPoints > dist * bendThreshold || distOfPoints < dist * 1 / bendThreshold) {
+if (/*distOfPoints > dist * bendThreshold || */distOfPoints < dist * 1 / bendThreshold) {
     if (!isHydrolic) {
         // Fix: Properly scale or transition the spring target distance instead of multiplying by a massive sum
         const oldSpringDist = b1.springDist[springIndex]
-        b1.springDist[springIndex] = (distOfPoints + (dist * 0.5)) / 1.5; 
-        b1.scaled *= b1.springDist[springIndex] / oldSpringDist
-        if (balls.indexOf(b1) < 43 || balls.indexOf(b2) < 43) {
-            
-        }
+        b1.springDist[springIndex] = (distOfPoints + (dist * 1)) / 2; 
+        
         return;
     }
     // Fix: Changed undefined ball1/ball2 to b1/b2
@@ -3186,6 +3308,7 @@ fireGuy = false
 isRaining = false
 dead = false
 carPuff = 1
+wheelPuff = 1
 time = 0
 
 balls =
