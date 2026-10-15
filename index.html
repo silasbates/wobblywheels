@@ -526,14 +526,14 @@ canvas {
 }
 
 .mobile-control {
-  flex: 0 0 120px;
-  width: 120px;
-  height: 120px;
+  flex: 0 0 187px;
+  width: 187px;
+  height: 187px;
   max-width: none;
   padding: 0;
   border: 2px solid rgba(255, 255, 255, 0.8);
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.12);
   color: white;
   font-size: 2rem;
   touch-action: none;
@@ -774,8 +774,9 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
     <label></label>
     
     <button id='spring'class="drawing side" onclick="drawing('spring', this)">spring</button>
-    
+    <!--
     <button class="drawing side selected" onclick="drawing('drive', this)">drive</button>
+  -->
     <button id='astroid'class="side" onclick="bigBall()">Astroid (A)</button>
     <button id='avalanche'class="side" onclick="avalanche()">avalanche (S)</button>
     <button id='lightning'class="side" onclick="lightning()">Lightning (L)</button>
@@ -1855,8 +1856,8 @@ function rocketThruster(enabled = false) {
     const forwardY = axisY / axisLength;
     const sideX = -forwardY;
     const sideY = forwardX;
-    const mountX = rear.x - forwardX * 5;
-    const mountY = rear.y - forwardY * 5;
+    const mountX = rear.x - forwardX * 7.5;
+    const mountY = rear.y - forwardY * 7.5;
 
     if (isThrusting && running) {
         for (let i = 0; i < Math.min(47, balls.length); i++) {
