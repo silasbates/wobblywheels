@@ -498,6 +498,62 @@ canvas {
   -webkit-touch-callout: none;
 }
 
+.container {
+  position: relative;
+}
+
+#mobileControls {
+  position: absolute;
+  z-index: 10;
+  left: 16px;
+  right: 16px;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  display: none;
+  justify-content: space-between;
+  align-items: end;
+  pointer-events: none;
+}
+
+#mobileControls.visible {
+  display: flex;
+}
+
+.mobile-control-group {
+  display: flex;
+  gap: 16px;
+  align-items: end;
+  pointer-events: auto;
+}
+
+.mobile-control {
+  flex: 0 0 120px;
+  width: 120px;
+  height: 120px;
+  max-width: none;
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: white;
+  font-size: 2rem;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#mobileAction {
+  font-size: 0.8rem;
+}
+
+#mobileAction[hidden] {
+  display: none;
+}
+
+.mobile-control.pressed {
+  background: rgba(90, 90, 150, 0.9);
+  transform: scale(0.94);
+}
+
 @media (max-width: 1200px) {
   #game {
     display: flex;
@@ -716,8 +772,6 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
     <label id="sliderLabel"></label>
     <input type="range" min="5" max="30" value="7" class="slider" id="slider"> 
     <label></label>
-    
-    <button class="drawing" onclick="drawing('point', this)">Build</button>
     
     <button id='spring'class="drawing side" onclick="drawing('spring', this)">spring</button>
     
@@ -1082,6 +1136,15 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
           
         </div>
     </div>
+    <div id="mobileControls" aria-label="Mobile game controls">
+        <div class="mobile-control-group">
+          <button class="mobile-control" aria-label="Drive left" onpointerdown="setMobileControl('left', true, event)" onpointerup="setMobileControl('left', false, event)" onpointercancel="setMobileControl('left', false, event)">&#8592;</button>
+        </div>
+        <div class="mobile-control-group">
+          <button id="mobileAction" class="mobile-control" aria-label="Rocket thrust" onpointerdown="setMobileControl('action', true, event)" onpointerup="setMobileControl('action', false, event)" onpointercancel="setMobileControl('action', false, event)">ACTION</button>
+          <button id="mobileRight" class="mobile-control" aria-label="Drive right" onpointerdown="setMobileControl('right', true, event)" onpointerup="setMobileControl('right', false, event)" onpointercancel="setMobileControl('right', false, event)">&#8594;</button>
+        </div>
+    </div>
   </div>
 </div>
 
@@ -1105,7 +1168,8 @@ let maps = [
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "red", carSize: 1, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+ carColor: "red", carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1114,7 +1178,8 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , 
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.2  , carColor: "red", carSize: 1, wheelSize: 1, steep: 0},
+friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.2,
+ carColor: "red", carSize: 1, wheelSize: 1, steep: 0, rocket: false},
 
 
 //jello
@@ -1122,7 +1187,8 @@ friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.2  , 
 thickness: 5, waterColor: '#AEF', grassColor: "rgba(155, 255, 0, 0.5)", 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#eed', 
 mountainColors: ["rgba(255, 0, 0, 0.5)", "rgba(155, 255, 0, 0.5)", "rgba(255, 255, 0, 0.5)", "rgba(255, 0, 255, 0.5)", "rgba(0, 255, 255, 0.5)"], drawShore: false, drawSun: true,
-friction: 1, restitution: 0, springSnap: 8, stiffness: 0.3, gravity: 0.2  , carColor: "rgba(255, 0, 0, 0.5)", carSize: 1, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 8, stiffness: 0.3, gravity: 0.2,
+ carColor: "rgba(255, 0, 0, 0.5)", carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1131,7 +1197,8 @@ friction: 1, restitution: 0, springSnap: 8, stiffness: 0.3, gravity: 0.2  , carC
 thickness: 5, waterColor: '#AEF', grassColor: 'white', 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#ddd', 
 mountainColors: ["white", "#dde", "ddf", "#ccF", "ddF"], drawShore: false, drawSun: true,
-friction: 0.3, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,  carColor: "brown", carSize: 1, wheelSize: 1, steep: 500},
+friction: 0.3, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
+ carColor: "brown", carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1142,7 +1209,8 @@ friction: 0.3, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2, 
 thickness: 100, waterColor: '#AEF', grassColor: '#eee', 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#ddd', 
 mountainColors: ["white", "#dde", "ddf", "#ccF", "ddF"], drawShore: false, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2, carColor: "brown", carSize: 1, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+ carColor: "brown", carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1154,7 +1222,8 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2, ca
 thickness: 5, waterColor: '#AEF', grassColor: "rgba(155, 255, 0, 0.5)", 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#eed', 
 mountainColors: ["rgba(255, 0, 0, 0.5)", "rgba(155, 255, 0, 0.5)", "rgba(255, 255, 0, 0.5)", "rgba(255, 0, 255, 0.5)", "rgba(0, 255, 255, 0.5)"], drawShore: false, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,  carColor: "yellow", carSize: 1, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+ carColor: "yellow", carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1163,7 +1232,8 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,  c
 thickness: 5,  waterColor: false, grassColor: "#446",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#44F", "gray", "#77F", "#60676b", "#11F"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.4, carColor: 'blue', carSize: 1, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.4,
+ carColor: 'blue', carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1176,7 +1246,8 @@ friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.4, carCo
 thickness: 5,  waterColor: false, grassColor: "gray",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.08, carColor: 'white', carSize: 1, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.08,
+ carColor: 'white', carSize: 1, wheelSize: 1, steep: 500, rocket: true},
 
 
 
@@ -1189,7 +1260,8 @@ friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.08, c
 thickness: 5,  waterColor: false, grassColor: "#f60",  
 sandColor: "#f6d597", skyColor: "#aaa", sunsetColor: "gray",
 mountainColors: ["orange", "red", "#f90", "#f60", "F50"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 4, stiffness: 0.99999, gravity: 0.2, windX: 0.12, carColor: 'white', carSize: 1, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 4, stiffness: 0.99999, gravity: 0.2, windX: 0.12,
+ carColor: 'white', carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1198,7 +1270,8 @@ friction: 1, restitution: 0, springSnap: 4, stiffness: 0.99999, gravity: 0.2, wi
 thickness: 5,  waterColor: false, grassColor: "#469f46",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#b4ffb4", "#0f0", "#0f0", "#60676b", "#928f92"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2, carColor: 'green', carSize: null, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2,
+ carColor: 'green', carSize: null, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1207,7 +1280,8 @@ friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2, carCo
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "maroon", carSize: 1.45, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+ carColor: "maroon", carSize: 1.45, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1216,7 +1290,8 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , 
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "#f99", carSize: 0.9, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+ carColor: "#f99", carSize: 0.9, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1234,7 +1309,8 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , 
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "red", carSize: 1, wheelSize: 0.75, steep: 500},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+ carColor: "red", carSize: 1, wheelSize: 0.75, steep: 500, rocket: false},
 
 
 
@@ -1244,7 +1320,8 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , 
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , carColor: "red", carSize: 1, wheelSize: 1.3, steep: 500},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+ carColor: "red", carSize: 1, wheelSize: 1.3, steep: 500, rocket: false},
 
 
 //Zero Gravity 
@@ -1252,7 +1329,8 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2  , 
 thickness: 5,  waterColor: false, grassColor: "#46265f",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#b45cff", "#8050a5", "#d19aff", "#60676b", "#9228df"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2, carColor: 'purple', carSize: 1, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+ carColor: 'purple', carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1262,7 +1340,8 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2, ca
 thickness: 5,  waterColor: false, grassColor: "#446",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#44F", "11F", "#77F", "#33F", "#11F"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2, carColor: 'blue', carSize: 1, wheelSize: 1, steep: 500},
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+ carColor: 'blue', carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
 
@@ -1307,12 +1386,8 @@ document.addEventListener('gesturechange', preventBrowserZoom, { passive: false 
 
 
 function toggleEvents(button) {
-    if (runEvents === true) {
-        button.textContent = "Events ON";
-    } else {
-        button.textContent = "Events OFF";
-    }
     runEvents = !runEvents;
+    button.textContent = runEvents ? "Events ON" : "Events OFF";
 }
     
  /*let totalColisions = 0
@@ -1533,6 +1608,7 @@ function StartGameplay() {
 zoom = 1
 makeCar()
 running = true
+  updateMobileControls();
   const overlayUi = document.getElementById('overlay-ui');
   const homeEl = document.getElementById('home');
   const settingsEl = document.getElementById('settings');
@@ -1623,6 +1699,11 @@ function updateGlobalState(key, value) {
 
 function openHomeMenu() {
   running = false; 
+  isSpacePressed = false;
+  isActionPressed = false;
+  driveLeft = false;
+  driveRight = false;
+  updateMobileControls();
   OpenMenu('home');
 }
 
@@ -1647,8 +1728,47 @@ function openHomeMenu() {
 
 let isLeftPressed = false;
 let isRightPressed = false;
+let isActionPressed = false;
+
+function updateMobileControls() {
+    const controls = document.getElementById('mobileControls');
+    const rightButton = document.getElementById('mobileRight');
+    const actionButton = document.getElementById('mobileAction');
+    if (controls) controls.classList.toggle('visible', running);
+    if (rightButton) rightButton.hidden = m.rocket;
+    if (actionButton) actionButton.hidden = !m.rocket;
+    if (!m.rocket) {
+        isActionPressed = false;
+        isSpacePressed = false;
+    }
+}
+
+const mobileControlPointers = new Map();
+
+function updateMobileControlStates() {
+    const active = [...mobileControlPointers.values()];
+    driveRight = active.includes('left');
+    driveLeft = active.includes('right');
+    isActionPressed = m.rocket && active.includes('action');
+}
+
+function setMobileControl(control, pressed, event) {
+    event.preventDefault();
+    if (pressed) {
+        event.currentTarget.setPointerCapture(event.pointerId);
+        mobileControlPointers.set(event.pointerId, control);
+    } else {
+        mobileControlPointers.delete(event.pointerId);
+    }
+    event.currentTarget.classList.toggle('pressed', pressed);
+    updateMobileControlStates();
+}
 
 window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && m.rocket) {
+        e.preventDefault();
+        isSpacePressed = true;
+    }
     if (e.key === 'ArrowLeft') {
         isLeftPressed = true;
     }
@@ -1658,6 +1778,9 @@ window.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('keyup', (e) => {
+    if (e.code === 'Space') {
+        isSpacePressed = false;
+    }
     if (e.key === 'ArrowLeft') {
         isLeftPressed = false;
     }
@@ -1697,15 +1820,94 @@ canvas.addEventListener('pointerdown', (event) => {
   }
 });
 
-window.addEventListener('pointerup', () => {
-  driveLeft = false;
-  driveRight = false;
+window.addEventListener('pointerup', (event) => {
+  if (mobileControlPointers.has(event.pointerId)) {
+    mobileControlPointers.delete(event.pointerId);
+    updateMobileControlStates();
+  } else if (mobileControlPointers.size === 0) {
+    driveLeft = false;
+    driveRight = false;
+  }
 });
 
 
 
 let driveLeft = false
 let driveRight = false
+
+function rocketThruster(enabled = false) {
+    const isThrusting = m.rocket && enabled === true;
+    if (!m.rocket || !balls || !balls[11] || !balls[21]) return;
+
+    const rearWheel = balls[11];
+    const frontWheel = balls[21];
+    const rearBodyTop = balls[22];
+    const rearBodyBottom = balls[43];
+    const rear = rearBodyTop && rearBodyBottom
+        ? { x: (rearBodyTop.x + rearBodyBottom.x) / 2, y: (rearBodyTop.y + rearBodyBottom.y) / 2 }
+        : rearWheel;
+    const axisX = frontWheel.x - rearWheel.x;
+    const axisY = frontWheel.y - rearWheel.y;
+    const axisLength = Math.hypot(axisX, axisY);
+    if (axisLength === 0) return;
+
+    const forwardX = axisX / axisLength;
+    const forwardY = axisY / axisLength;
+    const sideX = -forwardY;
+    const sideY = forwardX;
+    const mountX = rear.x - forwardX * 5;
+    const mountY = rear.y - forwardY * 5;
+
+    if (isThrusting && running) {
+        for (let i = 0; i < Math.min(47, balls.length); i++) {
+            const ball = balls[i];
+            if (!ball.anchor && typeof ball.xVel === "number") {
+                ball.xVel += forwardX * 0.18;
+                ball.yVel += forwardY * 0.18;
+            }
+        }
+    }
+
+    const point = (forward, side) => ({
+        x: ScrollX(mountX + forwardX * forward + sideX * side),
+        y: ScrollY(mountY + forwardY * forward + sideY * side)
+    });
+    const drawPolygon = (points, color) => {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.closePath();
+        ctx.fill();
+    };
+
+    ctx.save();
+    if (isThrusting) {
+        const flameLength = 27 + Math.sin(time * 0.8) * 6;
+        drawPolygon([
+            point(1, -5),
+            point(1, 5),
+            point(1 - flameLength, 0)
+        ], "#ff5a1f");
+        drawPolygon([
+            point(1, -2.5),
+            point(1, 2.5),
+            point(1 - flameLength * 0.65, 0)
+        ], "#ffd34d");
+    }
+    drawPolygon([
+        point(0, -7),
+        point(15, -5),
+        point(15, 5),
+        point(0, 7)
+    ], "#555");
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = Zoom(2);
+    ctx.stroke();
+    ctx.restore();
+}
 
 
 
@@ -1928,6 +2130,7 @@ function update() {
             ctx.fill();
         }
 		fillCar(true);
+        rocketThruster(isSpacePressed || isActionPressed);
         ctx.restore();
 
         
@@ -1936,6 +2139,7 @@ function update() {
     	drawNeptuneWinds();
     }
         
+    updateMobileControls();
         requestAnimationFrame(update);
         return;
     }
@@ -2165,6 +2369,7 @@ ctx.strokeText(text2, centerX, y + (size * 1.2));
 ctx.fillText(text2, centerX, y + (size * 1.2));
 
 fillCar()
+rocketThruster(isSpacePressed || isActionPressed)
 const LIGHTNING_COLOR = '#E0F7FA';
 const GLOW_COLOR = '#00E5FF';      
 if (arc > 0) {
@@ -2248,6 +2453,7 @@ ctx.lineWidth = Zoom(m.thickness)
     if (m.name === "neptune") {
     	drawNeptuneWinds();
     }
+    updateMobileControls();
     requestAnimationFrame(update);
 }  
 
@@ -2265,11 +2471,11 @@ function doEvents() {
         }
         
         
-		if (running) {
-        	doFire()
-        }
 		if (!runEvents) {
         	return;
+        }
+		if (running) {
+        	doFire()
         }
         if (balls[26].x < 400) {
         	return;
@@ -2358,6 +2564,7 @@ function doEvents() {
    // let bad = []
         document.addEventListener('pointerdown', (event) => {
     //if (running) return;
+    if (event.target.closest('#mobileControls')) return;
     if (!canvas.contains(event.target)) return;
     pointerStartedOnCanvas = true;
     const rect = canvas.getBoundingClientRect();
@@ -2366,15 +2573,11 @@ function doEvents() {
 mouseX = (mouseX - scrollX / zoom) * zoom
     mouseY = (mouseY - scrollY / zoom) * zoom
 
-
-
-
-
-
-    if (getInput("drawing") === 'spring' || getInput("drawing") === 'hydrolic') {
+    const activeDrawing = running && getInput("drawing") === 'drive' ? 'point' : getInput("drawing");
+    if (activeDrawing === 'spring' || activeDrawing === 'hydrolic') {
         selected = isNearBall(mouseX, mouseY, 15, false, true);
        
-    } else if (getInput("drawing") === 'point' || getInput("drawing") === 'anchor') {
+    } else if (activeDrawing === 'point' || activeDrawing === 'anchor') {
         if (mouseY > 20) {
 			let springsList = isNearBall(mouseX, mouseY, 100);
 			let springsDistList = isNearBall(mouseX, mouseY, 100, true);
@@ -2392,12 +2595,12 @@ mouseX = (mouseX - scrollX / zoom) * zoom
             let ball ={
                 x: mouseX,
                 y: mouseY,
-                xVel: getInput("drawing") === 'anchor' ? 0 : getInput("xVel"),
-                yVel: getInput("drawing") === 'anchor' ? 0 : getInput("yVel"),
+                xVel: activeDrawing === 'anchor' ? 0 : getInput("xVel"),
+                yVel: activeDrawing === 'anchor' ? 0 : getInput("yVel"),
                 radias: Number(getInput("slider")),
                 spring:     springsList,
                 springDist: springsDistList,
-                anchor: getInput("drawing") === 'anchor' ? [mouseX, mouseY] : false,
+                anchor: activeDrawing === 'anchor' ? [mouseX, mouseY] : false,
                 color: carColor
                
               
@@ -2415,13 +2618,13 @@ mouseX = (mouseX - scrollX / zoom) * zoom
             }
             balls.push(ball)
         }
-    } else if (getInput("drawing") === 'block') {
+    } else if (activeDrawing === 'block') {
         rectX = mouseX
         rectY = mouseY
-    } else if (getInput("drawing") === 'line') {
+    } else if (activeDrawing === 'line') {
         lineX = mouseX
         lineY = mouseY
-    } else if (getInput("drawing") === 'rope') {
+    } else if (activeDrawing === 'rope') {
         ropeX = mouseX
         ropeY = mouseY
     }
@@ -2437,26 +2640,27 @@ document.addEventListener('pointerup', (event) => {
     let mouseUpY = event.clientY - rect.top;
 mouseUpX = (mouseUpX - scrollX / zoom) * zoom
 mouseUpY = (mouseUpY - scrollY / zoom) * zoom
-    if (getInput("drawing") === 'spring' && selected !== null ||  getInput("drawing") === 'hydrolic') {
+    const activeDrawing = running && getInput("drawing") === 'drive' ? 'point' : getInput("drawing");
+    if (activeDrawing === 'spring' && selected !== null || activeDrawing === 'hydrolic') {
         let target = isNearBall(mouseUpX, mouseUpY, 15, false, true);
         if (target !== null && target !== selected) {
             const distOfBalls = getDistance(balls[selected].x, balls[selected].y, balls[target].x, balls[target].y);
             balls[selected].spring.push(target);
-            balls[selected].springDist.push(getInput("drawing") === 'hydrolic' ? distOfBalls / hydrolicSize : distOfBalls);
+            balls[selected].springDist.push(activeDrawing === 'hydrolic' ? distOfBalls / hydrolicSize : distOfBalls);
 
 
-             if (getInput("drawing") === 'hydrolic'){
+             if (activeDrawing === 'hydrolic'){
             hydrolics.push([balls[selected], balls[target]]);
         }
         }
     }
-    if (getInput("drawing") === 'line') {
+    if (activeDrawing === 'line') {
         makeLine(lineX, lineY, mouseUpX, mouseUpY)
     }
-    if (getInput("drawing") === 'block') {
+    if (activeDrawing === 'block') {
         makeBlock(rectX, rectY, (mouseUpX - rectX) / Number(getInput("slider")), (mouseUpY - rectY) / Number(getInput("slider")), Number(getInput("slider")))
     }
-    if (getInput("drawing") === 'rope') {
+    if (activeDrawing === 'rope') {
        
        // const ballLen = balls.length
         //const close = isNearBall(ropeX, ropeY, 50, false, true)
@@ -4024,8 +4228,3 @@ drawingInput = 'drive'
     </script>
 </body> 
 </html>
-
-
-
-
-
