@@ -502,6 +502,23 @@ canvas {
   position: relative;
 }
 
+.sound-credits {
+  position: absolute;
+  z-index: 11;
+  top: 8px;
+  right: 8px;
+  max-width: min(320px, 80vw);
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #eee;
+  font-size: 11px;
+}
+
+.sound-credits a {
+  color: #b9d8ff;
+}
+
 #mobileControls {
   position: absolute;
   z-index: 10;
@@ -1146,9 +1163,12 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
           <button id="mobileRight" class="mobile-control" aria-label="Drive right" onpointerdown="setMobileControl('right', true, event)" onpointerup="setMobileControl('right', false, event)" onpointercancel="setMobileControl('right', false, event)">&#8594;</button>
         </div>
     </div>
+    <details class="sound-credits">
+      <summary>Sound credits</summary>
+      <p>Impact: “Dull thud” by gregoryweir, public domain. <a href="https://commons.wikimedia.org/wiki/File:Dull_thud.ogg" target="_blank" rel="noopener noreferrer">Source</a>.</p>
+    </details>
   </div>
 </div>
-
 
 <script>
 	let sanboxMode  = false
@@ -1730,6 +1750,194 @@ function openHomeMenu() {
 let isLeftPressed = false;
 let isRightPressed = false;
 let isActionPressed = false;
+const soundFileCache = new Map();
+const crashSoundFile = './assets/sounds/crash-thud.ogg';
+const springSnapSoundFiles = {
+    small: './assets/sounds/small_car_crash.mp3',
+    medium: './assets/sounds/mid_car_crash.mp3',
+    large: './assets/sounds/bad_car_crash.mp3'
+};
+let driveAudioContext = null;
+let driveOscillator = null;
+let driveHarmonic = null;
+let driveFilter = null;
+let driveGain = null;
+let driveHarmonicGain = null;
+let driveNoise = null;
+let driveNoiseFilter = null;
+let driveNoiseGain = null;
+let lastCrashSoundTime = 0;
+
+function preloadSound(file) {
+    if (soundFileCache.has(file)) return soundFileCache.get(file);
+
+    try {
+        const cachedAudio = new Audio(file);
+        cachedAudio.preload = 'auto';
+        cachedAudio.addEventListener('error', () => {
+            console.error(`Could not load sound file "${file}":`, cachedAudio.error);
+        });
+        cachedAudio.load();
+        soundFileCache.set(file, cachedAudio);
+        return cachedAudio;
+    } catch (error) {
+        console.error(`Could not initialize sound file "${file}":`, error);
+        soundFileCache.set(file, null);
+        return null;
+    }
+}
+
+function playSound(file, volume = 1, playbackRate = 1) {
+    const source = preloadSound(file);
+    if (!source) return Promise.resolve(false);
+
+    try {
+        const audio = source.cloneNode();
+        audio.volume = Math.max(0, Math.min(volume, 1));
+        audio.playbackRate = playbackRate;
+        audio.preservesPitch = false;
+        const playback = audio.play();
+        if (playback && typeof playback.catch === 'function') {
+            return playback.catch(error => {
+                console.error(`Could not play sound file "${file}":`, error);
+                return false;
+            });
+        }
+        return Promise.resolve(true);
+    } catch (error) {
+        console.error(`Could not play sound file "${file}":`, error);
+        return Promise.resolve(false);
+    }
+}
+
+preloadSound(crashSoundFile);
+Object.values(springSnapSoundFiles).forEach(preloadSound);
+
+function initializeDriveSound() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) {
+        console.error('Drive sound is unavailable because this browser does not support Web Audio.');
+        return;
+    }
+
+    if (!driveAudioContext) {
+        driveAudioContext = new AudioContextClass();
+        driveOscillator = driveAudioContext.createOscillator();
+        driveHarmonic = driveAudioContext.createOscillator();
+        driveFilter = driveAudioContext.createBiquadFilter();
+        driveGain = driveAudioContext.createGain();
+        driveHarmonicGain = driveAudioContext.createGain();
+        driveNoise = driveAudioContext.createBufferSource();
+        driveNoiseFilter = driveAudioContext.createBiquadFilter();
+        driveNoiseGain = driveAudioContext.createGain();
+        const noiseBuffer = driveAudioContext.createBuffer(1, driveAudioContext.sampleRate * 2, driveAudioContext.sampleRate);
+        const noiseData = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < noiseData.length; i++) {
+            noiseData[i] = (Math.random() * 2 - 1) * 0.18;
+        }
+
+        driveOscillator.type = 'sawtooth';
+        driveOscillator.frequency.value = 48;
+        driveHarmonic.type = 'triangle';
+        driveHarmonic.frequency.value = 96;
+        driveFilter.type = 'lowpass';
+        driveFilter.frequency.value = 260;
+        driveGain.gain.value = 0;
+        driveHarmonicGain.gain.value = 0.22;
+        driveNoise.buffer = noiseBuffer;
+        driveNoise.loop = true;
+        driveNoiseFilter.type = 'bandpass';
+        driveNoiseFilter.frequency.value = 850;
+        driveNoiseFilter.Q.value = 0.7;
+        driveNoiseGain.gain.value = 0;
+
+        driveOscillator.connect(driveFilter);
+        driveHarmonic.connect(driveHarmonicGain);
+        driveHarmonicGain.connect(driveFilter);
+        driveFilter.connect(driveGain);
+        driveGain.connect(driveAudioContext.destination);
+        driveNoise.connect(driveNoiseFilter);
+        driveNoiseFilter.connect(driveNoiseGain);
+        driveNoiseGain.connect(driveAudioContext.destination);
+        driveOscillator.start();
+        driveHarmonic.start();
+        driveNoise.start();
+    }
+
+    if (driveAudioContext.state === 'suspended') {
+        driveAudioContext.resume().catch(error => console.error('Could not resume drive audio:', error));
+    }
+}
+
+function playCrashSound(impactSpeed) {
+    if (impactSpeed < 2) return;
+    const now = performance.now();
+    if (now - lastCrashSoundTime < 160) return;
+    lastCrashSoundTime = now;
+
+    playSound(crashSoundFile, 0.18 + Math.min(impactSpeed / 18, 1) * 0.62);
+}
+
+let lastSpringSnapSoundTime = 0;
+
+function playSpringSnapSound(strain) {
+    const soundRoll = Math.random();
+    const playChance = strain < 1.5 ? 0.1 : 0.5;
+    if (soundRoll >= playChance) return;
+
+    const now = performance.now();
+    if (now - lastSpringSnapSoundTime < 300) return;
+    lastSpringSnapSoundTime = now;
+
+    const sound = strain >= 2.5
+        ? springSnapSoundFiles.large
+        : strain >= 1.5
+            ? springSnapSoundFiles.medium
+            : springSnapSoundFiles.small;
+    const volume = Math.min(0.9, 0.45 + Math.max(0, strain - 1) * 0.18);
+    const randomPlaybackRate = 0.8 + Math.random() * 0.4;
+    playSound(sound, volume, randomPlaybackRate);
+}
+
+function playCarImpactSound(impactSpeed) {
+    if (impactSpeed < 0.5) return;
+
+    const now = performance.now();
+    if (now - lastSpringSnapSoundTime < 300) return;
+
+    const isSmallImpact = impactSpeed < 5;
+    if (isSmallImpact && Math.random() >= 0.1) return;
+    lastSpringSnapSoundTime = now;
+
+    const sound = impactSpeed >= 10
+        ? springSnapSoundFiles.large
+        : impactSpeed >= 5
+            ? springSnapSoundFiles.medium
+            : springSnapSoundFiles.small;
+    const volume = Math.min(0.9, 0.35 + impactSpeed / 24);
+    const randomPlaybackRate = 0.8 + Math.random() * 0.4;
+    playSound(sound, volume, randomPlaybackRate);
+}
+
+document.addEventListener('pointerdown', initializeDriveSound, { once: true });
+
+function updateDriveSound() {
+    if (!driveAudioContext || !driveGain || !driveOscillator || !driveHarmonic || !driveFilter || !driveNoiseGain || !driveNoiseFilter) return;
+
+    const throttle = isLeftPressed || isRightPressed || driveLeft || driveRight;
+    let speed = 0;
+    if (balls && balls[11] && balls[21]) {
+        speed = (Math.hypot(balls[11].xVel, balls[11].yVel) + Math.hypot(balls[21].xVel, balls[21].yVel)) / 2;
+    }
+    const rpm = 48 + Math.min(speed, 50) * 2.2 + (throttle ? 24 : 0);
+    const now = driveAudioContext.currentTime;
+    driveGain.gain.setTargetAtTime(running && throttle ? 0.03 : 0, now, 0.06);
+    driveOscillator.frequency.setTargetAtTime(rpm, now, 0.16);
+    driveHarmonic.frequency.setTargetAtTime(rpm * 2.01, now, 0.16);
+    driveFilter.frequency.setTargetAtTime(260 + Math.min(speed, 50) * 18 + (throttle ? 350 : 0), now, 0.14);
+    driveNoiseGain.gain.setTargetAtTime(running && throttle ? 0.006 : 0, now, 0.12);
+    driveNoiseFilter.frequency.setTargetAtTime(700 + Math.min(speed, 50) * 20, now, 0.16);
+}
 
 function updateMobileControls() {
     const controls = document.getElementById('mobileControls');
@@ -1756,6 +1964,7 @@ function updateMobileControlStates() {
 function setMobileControl(control, pressed, event) {
     event.preventDefault();
     if (pressed) {
+        if (control === 'left' || control === 'right') initializeDriveSound();
         event.currentTarget.setPointerCapture(event.pointerId);
         mobileControlPointers.set(event.pointerId, control);
     } else {
@@ -1766,6 +1975,7 @@ function setMobileControl(control, pressed, event) {
 }
 
 window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') initializeDriveSound();
     if (e.code === 'Space' && m.rocket) {
         e.preventDefault();
         isSpacePressed = true;
@@ -1806,6 +2016,7 @@ window.addEventListener('keyup', (e) => {
 
 
 canvas.addEventListener('pointerdown', (event) => {
+  initializeDriveSound();
   const rect = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const halfWidth = canvas.width / 2;
@@ -2046,6 +2257,7 @@ function update() {
 	ctx.lineCap = "round";
 
 	m = maps[mapId]
+    updateDriveSound()
 
 	if (!running && !carBalls) {
     
@@ -2981,6 +3193,8 @@ function getNormal(x1, y1, x2, y2) {
 
 
     function bounce(b, line) {
+                const impactSpeed = Math.hypot(b.xVel, b.yVel);
+                if (running && balls.indexOf(b) >= 0 && balls.indexOf(b) < 43) playCarImpactSound(impactSpeed);
       			if (m.name === 'sticky') {
                 	b.stick = stickAmount
                 	
@@ -3094,6 +3308,11 @@ function collideWithBall(ball1, ball2) {
         const relVelY = v1y - v2y;
         const velAlongNormal = (relVelX * nx) + (relVelY * ny);
         if (velAlongNormal > 0) return;
+        const ball1Index = balls.indexOf(ball1);
+        const ball2Index = balls.indexOf(ball2);
+        if (running && ball1Index >= 0 && ball1Index < 46 && ball2Index >= 0 && ball2Index < 46) {
+            playCarImpactSound(Math.abs(velAlongNormal));
+        }
         const impulse = -(1 + restitution) * velAlongNormal / 2;
        
         if (ball1.xVel !== "anchor") {
@@ -3140,7 +3359,7 @@ if (ball1.snow && Math.random() > 0.5 && !ball2.snow) {
     if (b1.color === "black" && b2.color === "black") {snapThreshold *= 5; bendThreshold *= 5}
     
     if (balls.indexOf(b1) < wheel2[1]) {bendThreshold *= 3  }
-const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || (pair[0] === b2 && pair[1] === b1));
+    const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || (pair[0] === b2 && pair[1] === b1));
     const dx = b1.x - b2.x;
     const dy = b1.y - b2.y;
     
@@ -3148,8 +3367,14 @@ const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || 
     if (distOfPoints > dist * snapThreshold ||
     distOfPoints < dist * 1 / snapThreshold) {
         if (!isHydrolic) {
-                b1.spring.splice(springIndex, 1);
-                b1.springDist.splice(springIndex, 1);
+                const snapStrain = Math.max(distOfPoints / dist, dist / distOfPoints) / snapThreshold;
+            const b1Index = balls.indexOf(b1);
+            const b2Index = balls.indexOf(b2);
+            if (b1Index >= 0 && b1Index < 46 && b2Index >= 0 && b2Index < 46) {
+                playSpringSnapSound(snapStrain);
+            }
+            b1.spring.splice(springIndex, 1);
+            b1.springDist.splice(springIndex, 1);
                 if (balls.indexOf(b1) < 43 || balls.indexOf(b2) < 43) snapped++
                 return;
            
@@ -3163,7 +3388,7 @@ const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || 
 }
    
     }
-if (/*distOfPoints > dist * bendThreshold || */distOfPoints < dist * 1 / bendThreshold) {
+if (false &&/*distOfPoints > dist * bendThreshold || */distOfPoints < dist * 1 / bendThreshold) {
     if (!isHydrolic) {
         // Fix: Properly scale or transition the spring target distance instead of multiplying by a massive sum
         const oldSpringDist = b1.springDist[springIndex]
@@ -4222,7 +4447,6 @@ function drawBg(CTX = ctx, CANVAS = canvas) {
   }
   }
 }
-
 drawbg = true;
 drawingInput = 'drive'
 //gravity = 0.2
