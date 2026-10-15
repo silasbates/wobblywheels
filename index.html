@@ -1900,13 +1900,13 @@ function playSpringSnapSound(strain) {
 }
 
 function playCarImpactSound(impactSpeed) {
-    if (impactSpeed < 0.5) return;
+    if (impactSpeed < 2) return;
 
     const now = performance.now();
     if (now - lastSpringSnapSoundTime < 300) return;
 
     const isSmallImpact = impactSpeed < 5;
-    if (isSmallImpact && Math.random() >= 0.1) return;
+    if (Math.random() >= (isSmallImpact ? 0.1 : 0.5)) return;
     lastSpringSnapSoundTime = now;
 
     const sound = impactSpeed >= 10
@@ -3194,7 +3194,7 @@ function getNormal(x1, y1, x2, y2) {
 
     function bounce(b, line) {
                 const impactSpeed = Math.hypot(b.xVel, b.yVel);
-                if (running && balls.indexOf(b) >= 0 && balls.indexOf(b) < 43) playCarImpactSound(impactSpeed);
+                if (running && balls.indexOf(b) < 43) playCrashSound(impactSpeed);
       			if (m.name === 'sticky') {
                 	b.stick = stickAmount
                 	
@@ -3308,11 +3308,6 @@ function collideWithBall(ball1, ball2) {
         const relVelY = v1y - v2y;
         const velAlongNormal = (relVelX * nx) + (relVelY * ny);
         if (velAlongNormal > 0) return;
-        const ball1Index = balls.indexOf(ball1);
-        const ball2Index = balls.indexOf(ball2);
-        if (running && ball1Index >= 0 && ball1Index < 46 && ball2Index >= 0 && ball2Index < 46) {
-            playCarImpactSound(Math.abs(velAlongNormal));
-        }
         const impulse = -(1 + restitution) * velAlongNormal / 2;
        
         if (ball1.xVel !== "anchor") {
@@ -3359,7 +3354,7 @@ if (ball1.snow && Math.random() > 0.5 && !ball2.snow) {
     if (b1.color === "black" && b2.color === "black") {snapThreshold *= 5; bendThreshold *= 5}
     
     if (balls.indexOf(b1) < wheel2[1]) {bendThreshold *= 3  }
-    const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || (pair[0] === b2 && pair[1] === b1));
+const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || (pair[0] === b2 && pair[1] === b1));
     const dx = b1.x - b2.x;
     const dy = b1.y - b2.y;
     
@@ -3388,7 +3383,7 @@ if (ball1.snow && Math.random() > 0.5 && !ball2.snow) {
 }
    
     }
-if (false &&/*distOfPoints > dist * bendThreshold || */distOfPoints < dist * 1 / bendThreshold) {
+if (/*distOfPoints > dist * bendThreshold || */distOfPoints < dist * 1 / bendThreshold) {
     if (!isHydrolic) {
         // Fix: Properly scale or transition the spring target distance instead of multiplying by a massive sum
         const oldSpringDist = b1.springDist[springIndex]
