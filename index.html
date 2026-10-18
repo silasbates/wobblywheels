@@ -257,8 +257,7 @@ button.active {
   background: rgba(255, 255, 255, 0.35);
 }
 
-#playButton:active {
-}
+
 
 #settings {
   pointer-events: auto;
@@ -783,7 +782,7 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
     </label>
   
     <button id='menuBtn' class="drawing" onclick="openHomeMenu()">☰</button>
-    <button class="drawing" onclick="makeCar()">reset</button>
+    <button class="drawing" onclick="resetCar()">reset</button>
     <button id="fullscrean" class="drawing" onclick="fullscrean()">⛶</button>
   
     <label id="sliderLabel"></label>
@@ -1171,6 +1170,7 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
 </div>
 
 <script>
+	let cameraRoll = true;
 	let sanboxMode  = false
   let noGravityTime = 50;
   let noGravity = 0;
@@ -1189,7 +1189,7 @@ let maps = [
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
  carColor: "red", carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
@@ -1199,7 +1199,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 4, stiffness: 0.99999, gravity: 0.2,
  carColor: "red", carSize: 1, wheelSize: 1, steep: 0, rocket: true},
 
 
@@ -1218,7 +1218,7 @@ friction: 1, restitution: 0, springSnap: 8, stiffness: 0.3, gravity: 0.2,
 thickness: 5, waterColor: '#AEF', grassColor: 'white', 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#ddd', 
 mountainColors: ["white", "#dde", "ddf", "#ccF", "ddF"], drawShore: false, drawSun: true,
-friction: 0.3, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
+friction: 0.3, restitution: 0, springSnap: 7, stiffness: 0.99999, gravity: 0.2,
  carColor: "brown", carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
@@ -1230,7 +1230,7 @@ friction: 0.3, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
 thickness: 100, waterColor: '#AEF', grassColor: '#eee', 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#ddd', 
 mountainColors: ["white", "#dde", "ddf", "#ccF", "ddF"], drawShore: false, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
  carColor: "brown", carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
@@ -1243,7 +1243,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
 thickness: 5, waterColor: '#AEF', grassColor: "rgba(155, 255, 0, 0.5)", 
 sandColor: 'white', skyColor: "#3b7eb3", sunsetColor: '#eed', 
 mountainColors: ["rgba(255, 0, 0, 0.5)", "rgba(155, 255, 0, 0.5)", "rgba(255, 255, 0, 0.5)", "rgba(255, 0, 255, 0.5)", "rgba(0, 255, 255, 0.5)"], drawShore: false, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
  carColor: "yellow", carSize: 1, wheelSize: 1, steep: 500, rocket: false},
 
 
@@ -1253,7 +1253,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
 thickness: 5,  waterColor: false, grassColor: "#446",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#44F", "gray", "#77F", "#60676b", "#11F"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.4,
+friction: 1, restitution: 0, springSnap: 14, stiffness: 0.8, gravity: 0.4,
  carColor: 'blue', carSize: 1, wheelSize: 1, steep: 500, rocket: true},
 
 
@@ -1267,7 +1267,7 @@ friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.4,
 thickness: 5,  waterColor: false, grassColor: "gray",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.08,
+friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.08,
  carColor: 'white', carSize: 1, wheelSize: 1, steep: 500, rocket: true},
 
 
@@ -1281,7 +1281,7 @@ friction: 1, restitution: 0, springSnap: 2, stiffness: 0.99999, gravity: 0.08,
 thickness: 5,  waterColor: false, grassColor: "#f60",  
 sandColor: "#f6d597", skyColor: "#aaa", sunsetColor: "gray",
 mountainColors: ["orange", "red", "#f90", "#f60", "F50"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 4, stiffness: 0.99999, gravity: 0.2, windX: 0.12,
+friction: 1, restitution: 0, springSnap: 6, stiffness: 0.99999, gravity: 0.2, windX: 0.12,
  carColor: 'white', carSize: 1, wheelSize: 1, steep: 500, rocket: true},
 
 
@@ -1291,7 +1291,7 @@ friction: 1, restitution: 0, springSnap: 4, stiffness: 0.99999, gravity: 0.2, wi
 thickness: 5,  waterColor: false, grassColor: "#469f46",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#b4ffb4", "#0f0", "#0f0", "#60676b", "#928f92"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 13, stiffness: 0.8, gravity: 0.2,
  carColor: 'green', carSize: null, wheelSize: 1, steep: 500, rocket: false},
 
 
@@ -1301,7 +1301,7 @@ friction: 1, restitution: 0, springSnap: 10, stiffness: 0.8, gravity: 0.2,
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
  carColor: "maroon", carSize: 1.45, wheelSize: 1, steep: 500, rocket: false},
 
 
@@ -1311,7 +1311,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
  carColor: "#f99", carSize: 0.9, wheelSize: 1, steep: 500, rocket: false},
 
 
@@ -1330,7 +1330,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
  carColor: "red", carSize: 1, wheelSize: 0.75, steep: 500, rocket: false},
 
 
@@ -1341,7 +1341,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
 thickness: 5,  waterColor: '#23537d', grassColor: "#4cbe21",  
 sandColor: "#f6d597", skyColor: "#3b7eb3", sunsetColor: "#ffd090",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: true, drawSun: true,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
  carColor: "red", carSize: 1, wheelSize: 1.3, steep: 500, rocket: false},
 
 
@@ -1350,7 +1350,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
 thickness: 5,  waterColor: false, grassColor: "#46265f",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#b45cff", "#8050a5", "#d19aff", "#60676b", "#9228df"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
  carColor: 'purple', carSize: 1, wheelSize: 1, steep: 500, rocket: true},
 
 
@@ -1361,7 +1361,7 @@ friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
 thickness: 5,  waterColor: false, grassColor: "#446",  
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#44F", "11F", "#77F", "#33F", "#11F"], drawShore: false, drawSun: false,
-friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.2,
+friction: 1, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
  carColor: 'blue', carSize: 1, wheelSize: 1, steep: 500, rocket: true},
 
 
@@ -1441,6 +1441,7 @@ r
 
 function toggleRain() {
 	isRaining = !isRaining
+    updateRainSound();
 }
 
 function pickLevel(levelIn, play = true, levelBtn = false) {
@@ -1477,6 +1478,7 @@ function startLevel(levelIn, play = true) {
 	
     	StartGameplay() 
         makeCar()
+        playEngineStartSound()
     
     levels = true
     
@@ -1629,6 +1631,7 @@ function StartGameplay() {
 zoom = 1
 makeCar()
 running = true
+playEngineStartSound()
   updateMobileControls();
   const overlayUi = document.getElementById('overlay-ui');
   const homeEl = document.getElementById('home');
@@ -1640,6 +1643,10 @@ running = true
   if (settingsEl) settingsEl.style.display = 'none';
   if (overlayUi) overlayUi.style.background = "none";
   if (levelsEl) levelsEl.style.display = "none";
+}
+
+function resetCar() {
+    makeCar();
 }
 
 function SyncFromSlider(key, val) {
@@ -1752,6 +1759,20 @@ let isRightPressed = false;
 let isActionPressed = false;
 const soundFileCache = new Map();
 const crashSoundFile = './assets/sounds/crash-thud.ogg';
+const engineStartSoundFile = './assets/sounds/car_engine_start.mp3';
+const engineStartSoundVolume = 0.25;
+const engineStartSoundCutoff = 3.5;
+const engineStartSoundFadeDuration = 0.75;
+const lightningSoundFile = './assets/sounds/lightning.mp3';
+const explosionSoundFile = './assets/sounds/explode.mp3';
+const rocketThrusterSoundFile = './assets/sounds/rocket.mp3';
+const rainSoundFile = './assets/sounds/rain_loop.mp3';
+const buttonClickSoundFile = './assets/sounds/click.mp3';
+const rocketThrusterSoundStartTrim = 0.1;
+const rocketThrusterSoundEndTrim = 0.1;
+const explosionSoundPlaybackRate = 1.5;
+const lightningSoundPlaybackRate = 1.2;
+const lightningSoundStartOffset = 0.2;
 const springSnapSoundFiles = {
     small: './assets/sounds/small_car_crash.mp3',
     medium: './assets/sounds/mid_car_crash.mp3',
@@ -1767,6 +1788,21 @@ let driveNoise = null;
 let driveNoiseFilter = null;
 let driveNoiseGain = null;
 let lastCrashSoundTime = 0;
+let activeSoundAudio = null;
+let engineStartAudio = null;
+let lastEngineStartSoundTime = -Infinity;
+let engineStartSoundFadeTimer = null;
+const rocketThrusterAudio = preloadSound(rocketThrusterSoundFile);
+const rainAudio = preloadSound(rainSoundFile);
+const rocketThrusterSoundState = {
+    requested: false,
+    pending: false,
+    blocked: false,
+    startOffset: rocketThrusterSoundStartTrim,
+    endTrim: rocketThrusterSoundEndTrim,
+    trimTimer: null
+};
+const rainSoundState = { requested: false, pending: false, blocked: false };
 
 function preloadSound(file) {
     if (soundFileCache.has(file)) return soundFileCache.get(file);
@@ -1787,31 +1823,184 @@ function preloadSound(file) {
     }
 }
 
-function playSound(file, volume = 1, playbackRate = 1) {
+function playSound(file, volume = 1, playbackRate = 1, interruptCurrent = false, startOffset = 0) {
     const source = preloadSound(file);
     if (!source) return Promise.resolve(false);
 
+    let audio = null;
+    if (activeSoundAudio && !activeSoundAudio.paused && !activeSoundAudio.ended) {
+        if (!interruptCurrent) return Promise.resolve(false);
+        activeSoundAudio.pause();
+        activeSoundAudio.currentTime = 0;
+    }
+
     try {
-        const audio = source.cloneNode();
+        audio = source.cloneNode();
         audio.volume = Math.max(0, Math.min(volume, 1));
         audio.playbackRate = playbackRate;
         audio.preservesPitch = false;
+        if (startOffset > 0) audio.currentTime = startOffset;
+        activeSoundAudio = audio;
+        const clearActiveSound = () => {
+            if (activeSoundAudio === audio) activeSoundAudio = null;
+        };
+        audio.addEventListener('ended', clearActiveSound, { once: true });
+        audio.addEventListener('error', clearActiveSound, { once: true });
         const playback = audio.play();
         if (playback && typeof playback.catch === 'function') {
             return playback.catch(error => {
+                clearActiveSound();
                 console.error(`Could not play sound file "${file}":`, error);
                 return false;
             });
         }
         return Promise.resolve(true);
     } catch (error) {
+        if (activeSoundAudio === audio) activeSoundAudio = null;
         console.error(`Could not play sound file "${file}":`, error);
         return Promise.resolve(false);
     }
 }
 
 preloadSound(crashSoundFile);
+engineStartAudio = preloadSound(engineStartSoundFile);
+if (engineStartAudio) engineStartAudio.volume = engineStartSoundVolume;
+preloadSound(lightningSoundFile);
+preloadSound(explosionSoundFile);
+const buttonClickSound = preloadSound(buttonClickSoundFile);
+document.addEventListener('click', event => {
+    if (!(event.target instanceof Element) || !buttonClickSound) return;
+    const button = event.target.closest('button');
+    if (!button || button.matches('[aria-label="Drive left"], [aria-label="Drive right"]')) return;
+
+    const audio = buttonClickSound.cloneNode();
+    audio.volume = 0.6;
+    const playback = audio.play();
+    if (playback && typeof playback.catch === 'function') {
+        playback.catch(error => {
+            console.error(`Could not play sound file "${buttonClickSoundFile}":`, error);
+        });
+    }
+});
+if (rocketThrusterAudio) {
+    rocketThrusterAudio.loop = true;
+    rocketThrusterAudio.volume = 0.7;
+    rocketThrusterAudio.addEventListener('timeupdate', () => {
+        if (Number.isFinite(rocketThrusterAudio.duration) &&
+            rocketThrusterAudio.currentTime >= rocketThrusterAudio.duration - rocketThrusterSoundEndTrim) {
+            rocketThrusterAudio.currentTime = rocketThrusterSoundStartTrim;
+        }
+    });
+}
+if (rainAudio) {
+    rainAudio.loop = true;
+    rainAudio.volume = 0.35;
+}
 Object.values(springSnapSoundFiles).forEach(preloadSound);
+
+function playEngineStartSound() {
+    if (!engineStartAudio) return;
+
+    const now = performance.now();
+    if (now - lastEngineStartSoundTime < 250) return;
+    lastEngineStartSoundTime = now;
+
+    if (engineStartSoundFadeTimer !== null) {
+        clearInterval(engineStartSoundFadeTimer);
+        engineStartSoundFadeTimer = null;
+    }
+    if (!engineStartAudio.paused) engineStartAudio.pause();
+    engineStartAudio.currentTime = 0;
+    engineStartAudio.volume = engineStartSoundVolume;
+    const playback = engineStartAudio.play();
+    if (playback && typeof playback.catch === 'function') {
+        playback.catch(error => {
+            console.error(`Could not play sound file "${engineStartSoundFile}":`, error);
+        });
+    }
+    engineStartSoundFadeTimer = setInterval(() => {
+        const currentTime = engineStartAudio.currentTime;
+        if (engineStartAudio.paused || currentTime >= engineStartSoundCutoff) {
+            engineStartAudio.pause();
+            engineStartAudio.currentTime = 0;
+            engineStartAudio.volume = engineStartSoundVolume;
+            clearInterval(engineStartSoundFadeTimer);
+            engineStartSoundFadeTimer = null;
+            return;
+        }
+
+        const fadeStart = engineStartSoundCutoff - engineStartSoundFadeDuration;
+        if (currentTime >= fadeStart) {
+            const fadeProgress = (currentTime - fadeStart) / engineStartSoundFadeDuration;
+            engineStartAudio.volume = engineStartSoundVolume * (1 - fadeProgress);
+        }
+    }, 25);
+}
+
+function updateLoopSound(audio, file, shouldPlay, state) {
+    if (!audio) return;
+    state.requested = shouldPlay;
+
+    if (!shouldPlay) {
+        state.blocked = false;
+        if (state.trimTimer !== null) {
+            clearInterval(state.trimTimer);
+            state.trimTimer = null;
+        }
+        if (!audio.paused) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+        return;
+    }
+
+    if (!audio.paused || state.pending || state.blocked) return;
+
+    state.pending = true;
+    try {
+        if (state.startOffset && audio.currentTime < state.startOffset) {
+            audio.currentTime = state.startOffset;
+        }
+        const playback = audio.play();
+        if (playback && typeof playback.then === 'function') {
+            playback.then(() => {
+                state.pending = false;
+                if (!state.requested) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    return;
+                }
+                if (state.endTrim && state.trimTimer === null) {
+                    state.trimTimer = setInterval(() => {
+                        if (!state.requested || audio.paused || !Number.isFinite(audio.duration)) return;
+                        if (audio.currentTime >= audio.duration - state.endTrim) {
+                            audio.currentTime = state.startOffset || 0;
+                        }
+                    }, 20);
+                }
+            }).catch(error => {
+                state.pending = false;
+                if (!state.requested) return;
+                state.blocked = true;
+                console.error(`Could not play sound file "${file}":`, error);
+            });
+        } else {
+            state.pending = false;
+        }
+    } catch (error) {
+        state.pending = false;
+        state.blocked = true;
+        console.error(`Could not play sound file "${file}":`, error);
+    }
+}
+
+function updateRocketThrusterSound(enabled) {
+    updateLoopSound(rocketThrusterAudio, rocketThrusterSoundFile, enabled && running, rocketThrusterSoundState);
+}
+
+function updateRainSound() {
+    updateLoopSound(rainAudio, rainSoundFile, isRaining && running, rainSoundState);
+}
 
 function initializeDriveSound() {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -1837,11 +2026,11 @@ function initializeDriveSound() {
         }
 
         driveOscillator.type = 'sawtooth';
-        driveOscillator.frequency.value = 48;
+        driveOscillator.frequency.value = 14;
         driveHarmonic.type = 'triangle';
-        driveHarmonic.frequency.value = 96;
+        driveHarmonic.frequency.value = 65;
         driveFilter.type = 'lowpass';
-        driveFilter.frequency.value = 260;
+        driveFilter.frequency.value = 180;
         driveGain.gain.value = 0;
         driveHarmonicGain.gain.value = 0.22;
         driveNoise.buffer = noiseBuffer;
@@ -1863,11 +2052,8 @@ function initializeDriveSound() {
         driveHarmonic.start();
         driveNoise.start();
     }
-
-    if (driveAudioContext.state === 'suspended') {
-        driveAudioContext.resume().catch(error => console.error('Could not resume drive audio:', error));
-    }
 }
+
 
 function playCrashSound(impactSpeed) {
     if (impactSpeed < 2) return;
@@ -1959,6 +2145,7 @@ function updateMobileControlStates() {
     driveRight = active.includes('left');
     driveLeft = active.includes('right');
     isActionPressed = m.rocket && active.includes('action');
+    updateRocketThrusterSound(isActionPressed);
 }
 
 function setMobileControl(control, pressed, event) {
@@ -1979,6 +2166,7 @@ window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && m.rocket) {
         e.preventDefault();
         isSpacePressed = true;
+        updateRocketThrusterSound(true);
     }
     if (e.key === 'ArrowLeft') {
         isLeftPressed = true;
@@ -1991,6 +2179,7 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => {
     if (e.code === 'Space') {
         isSpacePressed = false;
+        updateRocketThrusterSound(isActionPressed);
     }
     if (e.key === 'ArrowLeft') {
         isLeftPressed = false;
@@ -2049,6 +2238,7 @@ let driveRight = false
 
 function rocketThruster(enabled = false) {
     const isThrusting = m.rocket && enabled === true;
+    updateRocketThrusterSound(isThrusting);
     if (!m.rocket || !balls || !balls[11] || !balls[21]) return;
 
     const rearWheel = balls[11];
@@ -2258,6 +2448,7 @@ function update() {
 
 	m = maps[mapId]
     updateDriveSound()
+    updateRainSound()
 
 	if (!running && !carBalls) {
     
@@ -2791,6 +2982,19 @@ mouseX = (mouseX - scrollX / zoom) * zoom
         selected = isNearBall(mouseX, mouseY, 15, false, true);
        
     } else if (activeDrawing === 'point' || activeDrawing === 'anchor') {
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
         if (mouseY > 20) {
 			let springsList = isNearBall(mouseX, mouseY, 100);
 			let springsDistList = isNearBall(mouseX, mouseY, 100, true);
@@ -2829,7 +3033,12 @@ mouseX = (mouseX - scrollX / zoom) * zoom
                 ball.spring.splice(remove[s], 1)
                 ball.springDist.splice(remove[s], 1)
             }
-            balls.push(ball)
+            
+            
+            if (
+!(isNearBall(ball.x, ball.y, ball.radias * 2).length > 0)) {
+            	balls.push(ball)
+            }
         }
     } else if (activeDrawing === 'block') {
         rectX = mouseX
@@ -3187,7 +3396,6 @@ function getNormal(x1, y1, x2, y2) {
 
 
 
-
  
 
 
@@ -3344,7 +3552,6 @@ if (ball1.snow && Math.random() > 0.5 && !ball2.snow) {
         if (b1.color === 'black' && b2.color === 'black' && balls.indexOf(b1) < 46) {
         	dist *= wheelPuff
         }
-        b1.ogDist = b1.ogDist || b1.springDist
         
 		let springIndex = index;
 
@@ -3360,7 +3567,7 @@ const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || 
     
     
     if (distOfPoints > dist * snapThreshold ||
-    distOfPoints < dist * 1 / snapThreshold) {
+    distOfPoints < dist * (1 / snapThreshold)) {
         if (!isHydrolic) {
                 const snapStrain = Math.max(distOfPoints / dist, dist / distOfPoints) / snapThreshold;
             const b1Index = balls.indexOf(b1);
@@ -3383,7 +3590,7 @@ const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || 
 }
    
     }
-if (/*distOfPoints > dist * bendThreshold || */distOfPoints < dist * 1 / bendThreshold) {
+/*if (/*distOfPoints > dist * bendThreshold || distOfPoints < dist * 1 / bendThreshold) {
     if (!isHydrolic) {
         // Fix: Properly scale or transition the spring target distance instead of multiplying by a massive sum
         const oldSpringDist = b1.springDist[springIndex]
@@ -3398,7 +3605,7 @@ if (/*distOfPoints > dist * bendThreshold || */distOfPoints < dist * 1 / bendThr
     if (balls.indexOf(b2) < 43) { 
         totalColisions++; 
     }
-}
+}*/
 
 
     ctx.strokeStyle = b1.color
@@ -3958,10 +4165,9 @@ let fireTarget = 43
 
 function explode() {
 let fireTarget = 26
-    for (let i = 0; i < 100; i++) {
+    playSound(explosionSoundFile, 0.8, explosionSoundPlaybackRate, true);
     if (!balls || !balls[fireTarget]) return;
-
-
+    for (let i = 0; i < 100; i++) {
     let startX = balls[fireTarget].x + (Math.random() * 40 - 20);
     let startY = balls[fireTarget].y + (Math.random() * 40 - 20);
    
@@ -3996,6 +4202,8 @@ function lightning() {
 
 arc = 10
 let fireTarget = 26
+    playSound(lightningSoundFile, 0.7, lightningSoundPlaybackRate, true, lightningSoundStartOffset);
+    if (!balls || !balls[fireTarget]) return;
     for (let i = 0; i < 100; i++) {
     // Safety check: Ensure the vehicle node exists in the array
     if (!balls || !balls[fireTarget]) return;
