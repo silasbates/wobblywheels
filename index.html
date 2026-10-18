@@ -1284,7 +1284,7 @@ thickness: 5,  waterColor: false, grassColor: "#446",
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#44F", "gray", "#77F", "#60676b", "#11F"], drawShore: false, drawSun: false,
 friction: 1, restitution: 0, springSnap: 14, stiffness: 0.8, gravity: 0.4,
- carColor: 'blue', carSize: 1, wheelSize: 1, steep: 500, rocket: true, wind: false, space: true},
+ carColor: 'blue', carSize: 1, wheelSize: 1, steep: 500, rocket: true, wind: false, space: false},
 
 
 
@@ -1298,7 +1298,7 @@ thickness: 5,  waterColor: false, grassColor: "gray",
 sandColor: "#f6d597", skyColor: "black", sunsetColor: "black",
 mountainColors: ["#a1a8ad", "#7b8387", "#b3b9bc", "#60676b", "#8d9498"], drawShore: false, drawSun: false,
 friction: 1, restitution: 0, springSnap: 3, stiffness: 0.99999, gravity: 0.08,
- carColor: 'white', carSize: 1, wheelSize: 1, steep: 500, rocket: true, wind: false, space: true},
+ carColor: 'white', carSize: 1, wheelSize: 1, steep: 500, rocket: true, wind: false, space: false},
 
 
 
@@ -1815,13 +1815,16 @@ const engineStartSoundCutoff = 3.5;
 const engineStartSoundFadeDuration = 0.75;
 const lightningSoundFile = './assets/sounds/lightning.mp3';
 const explosionSoundFile = './assets/sounds/explode.mp3';
-const rocketThrusterSoundFile = './assets/sounds/space.mp3';
+const spaceSoundFile = './assets/sounds/space.mp3';
+const rocketThrusterSoundFile = './assets/sounds/rocket.mp3';
 const rainSoundFile = './assets/sounds/rain_loop.mp3';
 const windSoundFile = './assets/sounds/wind.mp3';
 const buttonClickSoundFile = './assets/sounds/click.mp3';
 const teleporterSoundFile = './assets/sounds/teleport.mp3';
-const rocketThrusterSoundStartTrim = 0.1;
-const rocketThrusterSoundEndTrim = 0.1;
+const spaceSoundCrossfadeDuration = 1.25;
+const spaceSoundVolume = 0.35;
+const rocketThrusterSoundFadeDuration = 0.2;
+const rocketThrusterSoundVolume = 0.7;
 const explosionSoundPlaybackRate = 1.5;
 const lightningSoundPlaybackRate = 1.2;
 const lightningSoundStartOffset = 0.2;
@@ -1844,6 +1847,10 @@ let activeSoundAudio = null;
 let engineStartAudio = null;
 let lastEngineStartSoundTime = -Infinity;
 let engineStartSoundFadeTimer = null;
+const spaceSoundSource = preloadSound(spaceSoundFile);
+const spaceSoundTracks = spaceSoundSource
+    ? [spaceSoundSource.cloneNode(), spaceSoundSource.cloneNode()]
+    : [];
 const rocketThrusterAudio = preloadSound(rocketThrusterSoundFile);
 const rainAudio = preloadSound(rainSoundFile);
 const windAudio = preloadSound(windSoundFile);
@@ -1851,15 +1858,18 @@ const rocketThrusterSoundState = {
     requested: false,
     pending: false,
     blocked: false,
-    startOffset: rocketThrusterSoundStartTrim,
-    endTrim: rocketThrusterSoundEndTrim,
-    trimTimer: null,
     volume: 0,
     targetVolume: 0,
-    maxVolume: 0.7,
-    fadeDuration: 0.2,
-    fadeTimer: null,
-    lastFadeUpdate: 0
+    fadeDuration: rocketThrusterSoundFadeDuration,
+    fadeTimer: null
+};
+const spaceSoundState = {
+    requested: false,
+    blocked: false,
+    pending: false,
+    currentTrack: -1,
+    transition: null,
+    timer: null
 };
 const rainSoundState = { requested: false, pending: false, blocked: false };
 const windSoundState = { requested: false, pending: false, blocked: false };
@@ -1945,13 +1955,18 @@ document.addEventListener('click', event => {
 });
 if (rocketThrusterAudio) {
     rocketThrusterAudio.loop = true;
-    rocketThrusterAudio.volume = 0.7;
-    rocketThrusterAudio.addEventListener('timeupdate', () => {
-        if (Number.isFinite(rocketThrusterAudio.duration) &&
-            rocketThrusterAudio.currentTime >= rocketThrusterAudio.duration - rocketThrusterSoundEndTrim) {
-            rocketThrusterAudio.currentTime = rocketThrusterSoundStartTrim;
-        }
+    rocketThrusterAudio.volume = 0;
+}
+spaceSoundTracks.forEach(audio => {
+    audio.preload = 'auto';
+    audio.volume = 0;
+    audio.load();
+    audio.addEventListener('error', () => {
+        console.error(`Could not load sound file "${spaceSoundFile}":`, audio.error);
     });
+});
+if (!spaceSoundSource) {
+    console.error(`Could not initialize sound file "${spaceSoundFile}".`);
 }
 if (rainAudio) {
     rainAudio.loop = true;
@@ -2060,7 +2075,195 @@ function updateLoopSound(audio, file, shouldPlay, state) {
 }
 
 function updateRocketThrusterSound(enabled) {
-    updateLoopSound(rocketThrusterAudio, rocketThrusterSoundFile, enabled && running, rocketThrusterSoundState);
+    const state = rocketThrusterSoundState;
+    const shouldPlay = enabled && running;
+    state.requested = shouldPlay;
+    if (!rocketThrusterAudio) return;
+
+    if (shouldPlay) {
+        if (state.blocked) return;
+        if (rocketThrusterAudio.paused && !state.pending) {
+            state.pending = true;
+            rocketThrusterAudio.volume = 0;
+            const playback = rocketThrusterAudio.play();
+            if (playback && typeof playback.then === 'function') {
+                playback.then(() => {
+                    state.pending = false;
+                    if (!state.requested) {
+                        rocketThrusterAudio.pause();
+                        rocketThrusterAudio.currentTime = 0;
+                        return;
+                    }
+                    fadeRocketThrusterVolume(rocketThrusterSoundVolume);
+                }).catch(error => {
+                    state.pending = false;
+                    if (!state.requested) return;
+                    state.blocked = true;
+                    console.error(`Could not play sound file "${rocketThrusterSoundFile}":`, error);
+                });
+            } else {
+                state.pending = false;
+                fadeRocketThrusterVolume(rocketThrusterSoundVolume);
+            }
+        } else if (!rocketThrusterAudio.paused) {
+            fadeRocketThrusterVolume(rocketThrusterSoundVolume);
+        }
+        return;
+    }
+
+    state.blocked = false;
+    if (state.pending || rocketThrusterAudio.paused) return;
+    fadeRocketThrusterVolume(0, () => {
+        if (!state.requested) {
+            rocketThrusterAudio.pause();
+            rocketThrusterAudio.currentTime = 0;
+        }
+    });
+}
+
+function fadeRocketThrusterVolume(targetVolume, onComplete) {
+    const state = rocketThrusterSoundState;
+    if (state.targetVolume === targetVolume) {
+        if (state.fadeTimer !== null) return;
+        if (rocketThrusterAudio.volume === targetVolume) {
+            if (onComplete) onComplete();
+            return;
+        }
+    }
+    if (state.fadeTimer !== null) {
+        clearInterval(state.fadeTimer);
+        state.fadeTimer = null;
+    }
+    state.targetVolume = targetVolume;
+    const startVolume = rocketThrusterAudio.volume;
+    const startTime = performance.now();
+    state.fadeTimer = setInterval(() => {
+        const progress = Math.min(1, (performance.now() - startTime) / (state.fadeDuration * 1000));
+        const volume = startVolume + (targetVolume - startVolume) * progress;
+        rocketThrusterAudio.volume = volume;
+        state.volume = volume;
+        if (progress >= 1) {
+            clearInterval(state.fadeTimer);
+            state.fadeTimer = null;
+            if (onComplete) onComplete();
+        }
+    }, 20);
+}
+
+function startSpaceSoundTrack(index, outgoingIndex = -1) {
+    const state = spaceSoundState;
+    const audio = spaceSoundTracks[index];
+    if (!audio || state.pending) return;
+
+    state.pending = true;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 0;
+    const playback = audio.play();
+    const onStarted = () => {
+        state.pending = false;
+        if (!state.requested) {
+            audio.pause();
+            audio.currentTime = 0;
+            return;
+        }
+        state.transition = {
+            incomingIndex: index,
+            outgoingIndex,
+            startedAt: performance.now()
+        };
+    };
+    if (playback && typeof playback.then === 'function') {
+        playback.then(onStarted).catch(error => {
+            state.pending = false;
+            if (!state.requested) return;
+            state.blocked = true;
+            console.error(`Could not play sound file "${spaceSoundFile}":`, error);
+        });
+    } else {
+        onStarted();
+    }
+}
+
+function stopSpaceSoundTrack(index) {
+    const audio = spaceSoundTracks[index];
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 0;
+}
+
+function updateSpaceSound() {
+    const state = spaceSoundState;
+    state.requested = Boolean(m.space) && running;
+
+    if (!state.requested) {
+        state.blocked = false;
+        if (state.currentTrack < 0 && !state.transition) {
+            if (state.timer !== null) {
+                clearInterval(state.timer);
+                state.timer = null;
+            }
+            return;
+        }
+        if (state.transition && (state.transition.incomingIndex >= 0 || !state.transition.duration)) {
+            const transition = state.transition;
+            state.transition = {
+                incomingIndex: -1,
+                outgoingIndex: transition.incomingIndex >= 0 ? transition.incomingIndex : state.currentTrack,
+                extraOutgoingIndex: transition.outgoingIndex,
+                startedAt: performance.now(),
+                duration: 0.35
+            };
+        } else if (!state.transition && state.currentTrack >= 0) {
+            state.transition = {
+                incomingIndex: -1,
+                outgoingIndex: state.currentTrack,
+                startedAt: performance.now(),
+                duration: 0.35
+            };
+        }
+    } else if (!state.blocked && state.currentTrack < 0 && !state.pending && !state.transition) {
+        startSpaceSoundTrack(0);
+    }
+
+    if (state.timer === null && (state.requested || state.transition)) {
+        state.timer = setInterval(() => {
+            if (state.transition) {
+                const transition = state.transition;
+                const duration = transition.duration || spaceSoundCrossfadeDuration;
+                const progress = Math.min(1, (performance.now() - transition.startedAt) / (duration * 1000));
+                if (transition.outgoingIndex >= 0) {
+                    spaceSoundTracks[transition.outgoingIndex].volume = spaceSoundVolume * (1 - progress);
+                }
+                if (transition.extraOutgoingIndex >= 0) {
+                    spaceSoundTracks[transition.extraOutgoingIndex].volume = spaceSoundVolume * (1 - progress);
+                }
+                if (transition.incomingIndex >= 0) {
+                    spaceSoundTracks[transition.incomingIndex].volume = spaceSoundVolume * progress;
+                }
+                if (progress >= 1) {
+                    if (transition.outgoingIndex >= 0) stopSpaceSoundTrack(transition.outgoingIndex);
+                    if (transition.extraOutgoingIndex >= 0) stopSpaceSoundTrack(transition.extraOutgoingIndex);
+                    state.currentTrack = transition.incomingIndex;
+                    state.transition = null;
+                }
+            }
+
+            if (state.requested && !state.blocked && !state.pending && !state.transition && state.currentTrack >= 0) {
+                const audio = spaceSoundTracks[state.currentTrack];
+                const remaining = audio.duration - audio.currentTime;
+                if (Number.isFinite(remaining) && remaining <= spaceSoundCrossfadeDuration) {
+                    startSpaceSoundTrack(1 - state.currentTrack, state.currentTrack);
+                }
+            }
+
+            if (!state.requested && !state.pending && !state.transition && state.currentTrack < 0) {
+                clearInterval(state.timer);
+                state.timer = null;
+            }
+        }, 25);
+    }
 }
 
 function updateRainSound() {
@@ -2539,6 +2742,7 @@ function update() {
 	m = maps[mapId]
     updateTeleporter()
     updateDriveSound()
+    updateSpaceSound()
     updateRainSound()
     updateWindSound()
 
