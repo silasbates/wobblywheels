@@ -480,6 +480,7 @@ button.active {
 }
 
 .value-input {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -662,7 +663,24 @@ canvas {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
-
+	#carSelect {
+    	
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: 0px 0px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    }
+    #carSelect {
+    	
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: 0px 0px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    }
   .tabs-header {
     gap: 6px;
   }
@@ -700,15 +718,8 @@ canvas {
   .btn:hover {
     transform: none;
   }
+
 }
-
-
-
-
-
-
-
-
 
 #levels {
   pointer-events: auto;
@@ -726,7 +737,109 @@ canvas {
   box-shadow: 0 8px 32px rgba(0,0,0,0.15);
   box-sizing: border-box;
 }
-
+#carSelect {
+  pointer-events: auto;
+  display: none; /* Controlled by OpenMenu() function */
+  flex-direction: column !important; /* Forces layout to stack grid on top of footer */
+  justify-content: flex-start;
+  align-items: center;
+  width: 84%;
+  height: 90%;
+  max-width: 760px;
+  background: rgba(15, 15, 15, 0);
+  /*backdrop-filter: blur(2px);*/
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0);
+  box-sizing: border-box;
+}
+#customCarMenu {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+  display: none; /* Controlled by OpenMenu() function */
+  flex-direction: column !important; /* Forces layout to stack grid on top of footer */
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 20px;
+}
+#customCarsidePanel {
+  pointer-events: auto;
+  align-self: flex-start;
+  width: min(300px, calc(100vw - 32px));
+  max-height: calc(100% - 100px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  background: rgba(16, 20, 30, 0.9);
+  color: white;
+  font-family: sans-serif;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+#customCarsidePanel h2 {
+  margin: 0 0 8px;
+}
+#customCarsidePanel p {
+  margin: 0 0 12px;
+  color: #ddd;
+  font-size: 0.9rem;
+}
+.custom-builder-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.custom-builder-tools button {
+  width: auto;
+  max-width: none;
+  padding: 9px 6px;
+  font-size: 0.95rem;
+}
+.custom-builder-tools button.active {
+  background: rgba(50, 120, 255, 0.65);
+}
+.custom-builder-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+.custom-builder-setting input[type="range"] {
+  width: 130px;
+}
+.custom-builder-setting input[type="color"] {
+  width: 48px;
+  height: 34px;
+  padding: 2px;
+}
+#customBuildStatus {
+  min-height: 1.2em;
+  margin-top: 12px !important;
+  color: #cde7ff !important;
+}
+#customCarMenu > .action-footer {
+  pointer-events: auto;
+  align-self: center;
+  margin-bottom: 10px;
+}
+@media (max-width: 1200px) {
+  #customCarsidePanel {
+    width: min(270px, calc(100vw - 32px));
+    max-height: calc(100% - 100px);
+    padding: 12px;
+  }
+  .custom-builder-tools button {
+    padding: 8px 4px;
+    font-size: 0.85rem;
+  }
+  #customCarMenu {
+    padding: 12px;
+  }
+}
 .levels-grid {
   display: flex;
   flex-direction: row;
@@ -872,6 +985,8 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
         
         <button id="levelButton" onclick="OpenMenu('levels')">Play</button>
         <button id="playButton" onclick="OpenMenu('settings')">Sanbox</button>
+        
+        <button id="playButton" onclick="OpenMenu('custom car')">Custom Car</button>
         
       </div>
       
@@ -1181,8 +1296,52 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
           
         </div>
           
+    </div>
+    <div id="customCarMenu" style="display: none;">
+    	<div id='customCarsidePanel'>
+        <h2>Custom Car Builder</h2>
+        <p id="customBuildStatus">Choose a tool, then build on the car preview.</p>
+        <div class="custom-builder-tools">
+          <button type="button" class="custom-tool active" onclick="setCarBuildTool('point', this)">Build</button>
+          <button type="button" class="custom-tool" onclick="setCarBuildTool('spring', this)">Connect</button>
+          <button type="button" class="custom-tool" onclick="setCarBuildTool('paint', this)">Paint</button>
+          <button type="button" class="custom-tool" onclick="setCarBuildTool('delete', this)">Erase</button>
+        </div>
+        <label class="custom-builder-setting" for="customCarColor">
+          <span>Point / paint color</span>
+          <input id="customCarColor" type="color" value="#ff0000" oninput="setCustomCarColor(this.value)">
+        </label>
+        <div class="custom-builder-tools">
+          <button type="button" onclick="resetCustomCar()">Reset Car</button>
+        </div>
+         </div>
+          
+          	<div class="action-footer">
+          <button class="back-btn" onclick="OpenMenu('home')">Back</button>
+          
+          <button class="settings-play-btn" onclick="selectCustomCar()">Select</button>
+          
+        </div>
+          
+        </div>
+        <div id="carSelect" style="display: none;">
+     	
+        
+          
+          
+          
+          	<div class="action-footer">
+          <button class="back-btn" onclick="OpenMenu('home')">Back</button>
+          <button id="carSelectPLay" class="settings-play-btn" onclick="startLevel()">Play</button>
+          
+          <button id="carSelectCustom" class="custom-btn" onclick="OpenMenu('custom car')">custom</button>
+          
+        </div>
+          
         </div>
     </div>
+    
+        </div>
     <div id="mobileControls" aria-label="Mobile game controls">
         <div class="mobile-control-group">
           <button class="mobile-control" aria-label="Drive left" onpointerdown="setMobileControl('left', true, event)" onpointerup="setMobileControl('left', false, event)" onpointercancel="setMobileControl('left', false, event)">&#8592;</button>
@@ -1200,6 +1359,7 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
 </div>
 
 <script>
+	let garage = false;
 	let cameraRoll = false;
 	let sanboxMode  = false
   let noGravityTime = 50;
@@ -1498,13 +1658,13 @@ function pickLevel(levelIn, play = true, levelBtn = false) {
 	
     mapId = levelIn - 1
     noGravity = 0
-    if (play) {
-        StartGameplay() 
-        makeCar()
-    }
     m = maps[mapId]
     applySettings()
-    makeCar()
+    if (play) {
+        startLevel();
+    } else {
+        makeCar();
+    }
     
 	carBalls = [...balls];
     
@@ -1525,13 +1685,8 @@ function pickLevel(levelIn, play = true, levelBtn = false) {
 
 
 function startLevel(levelIn, play = true) {
-	
-    	StartGameplay() 
-        makeCar()
-        playEngineStartSound()
-    
     levels = true
-    
+    StartGameplay()
 }
 
 
@@ -1590,36 +1745,55 @@ function applySettings() {
     
 }
 
+let menu = 'home';
+let selectedCustomCar = null;
 
-
-function OpenMenu(menu = 'home') {
+function OpenMenu(menuIn = 'home') {
+  const returningFromCustomCar = isCustomCarActive && menuIn !== 'custom car';
+	menu = menuIn
+  if (returningFromCustomCar) {
+    if (selectedCustomCar) {
+      applySelectedCarToCurrentGame();
+    } else {
+      isCustomCarActive = false;
+      makeCar();
+    }
+    carBalls = [...balls];
+  }
   const overlayUi = document.getElementById('overlay-ui');
   const homeEl = document.getElementById('home');
   const settingsEl = document.getElementById('settings');
-  
   const levelsEl = document.getElementById('levels');
+  const carSelectEl = document.getElementById('carSelect');
+  const customCarEl = document.getElementById('customCarMenu');
 
   if (overlayUi) overlayUi.style.background = "rgba(0, 0, 0, 0.2)";
   if (homeEl) homeEl.style.display = 'none';
   if (settingsEl) settingsEl.style.display = 'none';
-  
+  if (carSelectEl) settingsEl.style.display = 'none';
   if (levelsEl) levelsEl.style.display = 'none';
+  if (carSelectEl) carSelectEl.style.display = 'none';
+  if (customCarEl) customCarEl.style.display = 'none';
 
-  if (menu === 'home' && homeEl) {
+  if (menuIn === 'home' && homeEl) {
     homeEl.style.display = 'flex';
-  } else if (menu === 'settings' && settingsEl) {
+  } else if (menuIn === 'settings' && settingsEl) {
     settingsEl.style.display = 'flex';
-  } else if (menu === 'levels' && levelsEl) {
+  } else if (menuIn === 'levels' && levelsEl) {
     levelsEl.style.display = 'flex';
+  } else if (menuIn === 'levels' && levelsEl) {
+    levelsEl.style.display = 'flex';
+  } else if (menuIn === 'car select' && carSelectEl) {
+    carSelectEl.style.display = 'flex';
+  } else if (menuIn === 'custom car' && customCarEl) {
+    customCarEl.style.display = 'flex';
+    openCustomCarBuilder();
   }
 }
 
 function startSanbox() {
-	
-    
+    levels = false;
     StartGameplay()
-    levels = false
-    
 }
 
 function OpenSubSection(section) {
@@ -1678,25 +1852,237 @@ function SetPreset(type) {
 }
 
 function StartGameplay() {
+menu = 'none'
 zoom = 1
 makeCar()
+applySelectedCarToCurrentGame()
 running = true
 playEngineStartSound()
   updateMobileControls();
   const overlayUi = document.getElementById('overlay-ui');
   const homeEl = document.getElementById('home');
   const settingsEl = document.getElementById('settings');
-  
   const levelsEl = document.getElementById('levels');
+  const carSelectEl = document.getElementById('carSelect');
+  const customCarEl = document.getElementById('customCarMenu');
 
   if (homeEl) homeEl.style.display = 'none';
   if (settingsEl) settingsEl.style.display = 'none';
   if (overlayUi) overlayUi.style.background = "none";
   if (levelsEl) levelsEl.style.display = "none";
+  if (customCarEl) customCarEl.style.display = "none";
+  if (carSelectEl) carSelectEl.style.display = "none";
+}
+
+const customCarStorageKey = 'wobblyWheelsCustomCar';
+const standardCarBallCount = 46;
+let carBaseBallCount = standardCarBallCount;
+let standardCarSpringCount = 1;
+let survivalSpringCount = 1;
+let isCustomCarActive = false;
+const customCarCutY = 145;
+let customCarData = null;
+
+function copyCarBalls(source) {
+    return source.map(ball => ({
+        ...ball,
+        spring: [...ball.spring],
+        springDist: [...ball.springDist],
+        anchor: Array.isArray(ball.anchor) ? [...ball.anchor] : ball.anchor
+    }));
+}
+
+function isValidCustomCar(data) {
+    return Array.isArray(data) && data.length >= 22 &&
+        data.every(ball => ball && Number.isFinite(ball.x) && Number.isFinite(ball.y) &&
+            Number.isFinite(ball.radias) && Array.isArray(ball.spring) &&
+            Array.isArray(ball.springDist) && ball.spring.length === ball.springDist.length &&
+            ball.spring.every(index => Number.isInteger(index) && index >= 0 && index < data.length));
+}
+
+function countSurvivalSprings() {
+    return balls.reduce((count, ball, index) =>
+        count + ball.spring.filter(targetIndex =>
+            balls[targetIndex] && (index < 43 || targetIndex < 43)
+        ).length, 0);
+}
+
+function applySelectedCarToCurrentGame() {
+    if (!selectedCustomCar) {
+        isCustomCarActive = false;
+        carBaseBallCount = standardCarBallCount;
+        survivalSpringCount = standardCarSpringCount;
+        return;
+    }
+    balls = copyCarBalls(selectedCustomCar);
+    carBaseBallCount = balls.filter(ball => !ball.customCarPoint).length;
+    isCustomCarActive = true;
+    survivalSpringCount = countSurvivalSprings();
+}
+
+function loadCustomCar() {
+    try {
+        const savedCar = localStorage.getItem(customCarStorageKey);
+        if (!savedCar) return null;
+        const parsedCar = JSON.parse(savedCar);
+        if (!isValidCustomCar(parsedCar)) {
+            console.error('Saved custom car data is invalid.');
+            return null;
+        }
+        return parsedCar;
+    } catch (error) {
+        console.error('Could not load the saved custom car:', error);
+        return null;
+    }
+}
+
+function openCustomCarBuilder() {
+    running = false;
+    isCustomCarActive = true;
+    makeCar();
+    const savedCar = loadCustomCar();
+    if (savedCar) {
+        balls = copyCarBalls(savedCar);
+        if (!balls.some(ball => ball.customCarPoint) && balls.length > standardCarBallCount) {
+            balls.forEach((ball, index) => {
+                if (index >= standardCarBallCount) ball.customCarPoint = true;
+            });
+        }
+        if (balls.length >= standardCarBallCount &&
+            !balls.slice(0, standardCarBallCount).some(ball => ball.customCarPoint)) {
+            restoreCustomCarBaseShape(balls);
+        }
+    } else {
+        customCarData = copyCarBalls(balls);
+    }
+    balls = removeCustomCarRoofPoints(balls);
+    carBaseBallCount = balls.filter(ball => !ball.customCarPoint).length;
+    carBalls = copyCarBalls(balls);
+    customCarData = copyCarBalls(balls);
+    const colorInput = document.getElementById('customCarColor');
+    if (colorInput && /^#[0-9a-f]{6}$/i.test(carColor)) colorInput.value = carColor;
+    setCarBuildTool('point');
+}
+
+function restoreCustomCarBaseShape(car) {
+    const standardRoofHeights = [155, 135, 117, 102, 92, 87, 91, 96, 108, 126, 127, 123, 117];
+    const roofStart = 31;
+    if (car.length < roofStart + standardRoofHeights.length) return;
+    standardRoofHeights.forEach((y, offset) => {
+        car[roofStart + offset].y = y;
+    });
+    for (let index = roofStart; index < roofStart + standardRoofHeights.length; index++) {
+        const point = car[index];
+        point.spring.forEach((linkedIndex, springIndex) => {
+            const linkedPoint = car[linkedIndex];
+            if (!linkedPoint) return;
+            const distance = getDistance(point.x, point.y, linkedPoint.x, linkedPoint.y);
+            point.springDist[springIndex] = distance;
+            const reciprocalIndex = linkedPoint.spring.indexOf(index);
+            if (reciprocalIndex >= 0) linkedPoint.springDist[reciprocalIndex] = distance;
+        });
+    }
+}
+
+function removeCustomCarRoofPoints(car) {
+    const keepIndex = car.map((ball, index) =>
+        index < 22 || ball.customCarPoint || ball.y >= customCarCutY
+    );
+    const indexMap = new Map();
+    let nextIndex = 0;
+    keepIndex.forEach((keep, index) => {
+        if (keep) indexMap.set(index, nextIndex++);
+    });
+    const keptBalls = car.filter((ball, index) => keepIndex[index]);
+    keptBalls.forEach(ball => {
+        const retainedSprings = [];
+        const retainedDistances = [];
+        ball.spring.forEach((linkedIndex, springIndex) => {
+            const remappedIndex = indexMap.get(linkedIndex);
+            if (remappedIndex === undefined) return;
+            retainedSprings.push(remappedIndex);
+            retainedDistances.push(ball.springDist[springIndex]);
+        });
+        ball.spring = retainedSprings;
+        ball.springDist = retainedDistances;
+    });
+    return keptBalls;
+}
+
+function setCarBuildTool(tool, button) {
+    drawingInput = tool;
+    document.querySelectorAll('.custom-tool').forEach(toolButton => {
+        toolButton.classList.toggle('active', toolButton === button || (!button && tool === 'point' && toolButton.textContent === 'Add Point'));
+    });
+    const instructions = {
+        point: 'Click the preview to add a connected point.',
+        spring: 'Drag between two points to connect them.',
+        paint: 'Click or drag over points to paint them.',
+        delete: 'Click an added point to erase it.'
+    };
+    const status = document.getElementById('customBuildStatus');
+    if (status) status.textContent = instructions[tool] || instructions.point;
+}
+
+function setCustomCarColor(color) {
+    if (!/^#[0-9a-f]{6}$/i.test(color)) return;
+    carColor = color;
+}
+
+function paintCustomCarPointAt(x, y) {
+    if (menu !== 'custom car') return false;
+    const pointIndex = isNearBall(x, y, 24, false, true);
+    const point = pointIndex === null ? null : balls[pointIndex];
+    const color = document.getElementById('customCarColor')?.value;
+    if (!point || pointIndex <= wheel2[1] ||
+        getDistance(x, y, point.x, point.y) >= 24 ||
+        !/^#[0-9a-f]{6}$/i.test(color) || point.color === color) return false;
+    point.color = color;
+    carBalls = copyCarBalls(balls);
+    return true;
+}
+
+function saveCustomCar() {
+    if (!isValidCustomCar(balls)) {
+        console.error('Cannot save the custom car because its point or spring data is invalid.');
+        const status = document.getElementById('customBuildStatus');
+        if (status) status.textContent = 'Could not save: the car data is invalid.';
+        return;
+    }
+    customCarData = copyCarBalls(balls);
+    try {
+        localStorage.setItem(customCarStorageKey, JSON.stringify(customCarData));
+        const status = document.getElementById('customBuildStatus');
+        if (status) status.textContent = 'Custom car saved in this browser.';
+    } catch (error) {
+        console.error('Could not save the custom car:', error);
+        const status = document.getElementById('customBuildStatus');
+        if (status) status.textContent = 'Could not save the car in this browser.';
+    }
+}
+
+function resetCustomCar() {
+    makeCar();
+    balls = removeCustomCarRoofPoints(balls);
+    carBaseBallCount = balls.length;
+    carBalls = copyCarBalls(balls);
+    saveCustomCar();
+    isCustomCarActive = true;
+}
+
+function selectCustomCar() {
+    if (!isValidCustomCar(balls)) {
+        console.error('Cannot select the custom car because its point or spring data is invalid.');
+        return;
+    }
+    saveCustomCar();
+    selectedCustomCar = copyCarBalls(balls);
+    OpenMenu('home');
 }
 
 function resetCar() {
     makeCar();
+    applySelectedCarToCurrentGame();
 }
 
 function SyncFromSlider(key, val) {
@@ -2732,11 +3118,19 @@ let carBalls = false;
 
 let menuZoom = -300
 
+let menuZoom2 = -500
+let menuZoomTarget2 = 0
+const renderedSpringTriangles = new Set();
+const triangleColorContext = document.createElement('canvas').getContext('2d');
+
 function update() {
+  renderedSpringTriangles.clear();
   time++
   if (m.name === 'sizing') {
   	carPuff = (Math.sin(time / 25) / 5) + 1
   }
+  
+  	garage = (menu === 'custom car' || menu === 'car select')
 	ctx.lineCap = "round";
 
 	m = maps[mapId]
@@ -2756,14 +3150,19 @@ function update() {
         menuZoom = -300
     }
 	if (isRightPressed || driveLeft) {
-		
-                rotate(wheel1[0], wheel1[1], 75)
-                rotate(wheel2[0], wheel2[1], 75)
+    	if (garage && Math.abs(menuZoom2) < 50) {
+			menuZoomTarget2 = -600
+        }
+        rotate(wheel1[0], wheel1[1], 75)
+       	rotate(wheel2[0], wheel2[1], 75)
 	}
     if (isLeftPressed || driveRight) {
-		
-                rotate(wheel1[0], wheel1[1], -75)
-                rotate(wheel2[0], wheel2[1], -75)
+    	if (garage && Math.abs(menuZoom2) < 50) {
+			menuZoomTarget2 = 600
+        }
+		menuZoomTarget2 = 600
+        rotate(wheel1[0], wheel1[1], -75)
+		rotate(wheel2[0], wheel2[1], -75)
 	}
 		applySettings()
        doEvents()
@@ -2790,30 +3189,61 @@ function update() {
     
     
     
-    
+    	if (!running && garage) {
+        	
+        	
+        }
     
     
     
     
         if (!running) {
         //balls = []
-        menuZoom += (-50 - menuZoom) / 10
-        scrollX = menuZoom;
-        scrollY = menuZoom - 30;
-        zoom = 0.25;
+        let displayBalls = carBalls
+        if (garage) {
+        	displayBalls = balls
+        }
+
+        
+        if (garage) {
+        	menuZoom2 += (menuZoomTarget2 - menuZoom2) / 20
+        	scrollX = menuZoom2 - 100;
+        	scrollY = -150;
+        	zoom = 0.3;
+            menuZoom = -300
+            if (menuZoom2 > 500) {
+            	menuZoom2 = -500
+                menuZoomTarget2 = 0
+            }
+            if (menuZoom2 < -500) {
+            	menuZoom2 = 500
+                menuZoomTarget2 = 0
+            }
+        } else {
+        	menuZoom += (-50 - menuZoom) / 10
+        	scrollX = menuZoom;
+        	scrollY = menuZoom - 30;
+        	zoom = 0.25;
+            menuZoom2 = -500
+            
+                menuZoomTarget2 = 0
+            
+        }
         
         ctx.save();
         const cx = canvas.width / 2;
         const cy = canvas.height / 2;
-        ctx.translate(cx - 250, cy);
+            ctx.translate(cx - 250, cy);
+        if (!garage) {
         ctx.rotate((((Math.sin(time / 40) * 10) - 7) * Math.PI) / 180);
+        
         ctx.translate(-(cx - 250), -cy);
-
-        for (let b of carBalls) {
+}
+        for (let b of displayBalls) {
             b.color = b.color || 'black';
             for (let s of b.spring) {
                 if (balls[s]) {
-                    spring(b, carBalls[s], b.springDist[b.spring.indexOf(s)]);
+                    spring(b, garage ? balls[s] : carBalls[s], b.springDist[b.spring.indexOf(s)]);
                 }
             }
             if (b.anchor) {
@@ -2822,11 +3252,7 @@ function update() {
                 ctx.fillStyle = b.color;
             }
             ctx.beginPath();
-            if (b.color === carColor) {
-                ctx.arc(ScrollX(b.x), ScrollY(b.y), Zoom(b.radias) / carBodySize, 0, 2 * Math.PI, false);
-            } else {
-                ctx.arc(ScrollX(b.x), ScrollY(b.y), Zoom(b.radias), 0, 2 * Math.PI, false);
-            }
+            ctx.arc(ScrollX(b.x), ScrollY(b.y), getCarBallRadius(b), 0, 2 * Math.PI, false);
             ctx.fill();
         }
 		fillCar(true);
@@ -2927,11 +3353,7 @@ if (b.anchor) {
             b.yVel = 0;
         }
         ctx.beginPath();
-        if (b.color === carColor) {
-             ctx.arc(ScrollX(b.x), ScrollY(b.y), Zoom(b.radias) / carBodySize, 0, 2 * Math.PI, false);
-             } else {
-             ctx.arc(ScrollX(b.x), ScrollY(b.y), Zoom(b.radias), 0, 2 * Math.PI, false);
-             }
+        ctx.arc(ScrollX(b.x), ScrollY(b.y), getCarBallRadius(b), 0, 2 * Math.PI, false);
         ctx.fill();
         /*for (let j = drawTo.length f- 1; j < 0; j--) {
             if (drawTo[j][2] === balls.indexOf(b)) {
@@ -2961,7 +3383,9 @@ if (b.anchor) {
    	
     b.color = b.color  || 'black'
         for (let s of b.spring) {
-            if (b.deadFire) return
+            if (b.deadFire) {
+                return;
+            }
             if (balls[s]) {
                 spring(b, balls[s], b.springDist[b.spring.indexOf(s)], b.spring.indexOf(s));
             }
@@ -2982,16 +3406,13 @@ if (b.anchor) {
             ctx.fillStyle = b.color
         }
              ctx.beginPath();
-             if (b.color === carColor) {
-             ctx.arc(ScrollX(b.x), ScrollY(b.y), Zoom(b.radias) / carBodySize, 0, 2 * Math.PI, false);
-             } else {
-             ctx.arc(ScrollX(b.x), ScrollY(b.y), Zoom(b.radias), 0, 2 * Math.PI, false);
-             }
+             ctx.arc(ScrollX(b.x), ScrollY(b.y), getCarBallRadius(b), 0, 2 * Math.PI, false);
         
         ctx.fill();
         }
     }
-let survivalChance = Math.exp(-0.04 * snapped) * 110;
+const normalizedSnapped = snapped * standardCarSpringCount / Math.max(1, survivalSpringCount);
+let survivalChance = Math.exp(-0.04 * normalizedSnapped) * 110;
 if (survivalChance > 10) {
     survivalChance = Math.floor(survivalChance);
 } else {
@@ -3266,23 +3687,57 @@ function doEvents() {
     let ropeY = null
     let snapped = 0
    let pointerStartedOnCanvas = false
+   let customCarPaintChanged = false
+   function canvasPointerToWorld(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const screenX = (clientX - rect.left) * (canvas.width / rect.width);
+    const screenY = (clientY - rect.top) * (canvas.height / rect.height);
+    if (menu === 'custom car') {
+        const garageOffsetX = canvas.width / 2 - 250;
+        const garageOffsetY = canvas.height / 2;
+        return {
+            x: (screenX - garageOffsetX) * zoom - scrollX,
+            y: (screenY - garageOffsetY) * zoom - scrollY
+        };
+    }
+    return {
+        x: (screenX - scrollX / zoom) * zoom,
+        y: (screenY - scrollY / zoom) * zoom
+    };
+   }
    // let bad = []
         document.addEventListener('pointerdown', (event) => {
     //if (running) return;
     if (event.target.closest('#mobileControls')) return;
     if (!canvas.contains(event.target)) return;
     pointerStartedOnCanvas = true;
-    const rect = canvas.getBoundingClientRect();
-    let mouseX = event.clientX - rect.left;
-    let mouseY = event.clientY - rect.top;
-mouseX = (mouseX - scrollX / zoom) * zoom
-    mouseY = (mouseY - scrollY / zoom) * zoom
+    customCarPaintChanged = false;
+    const pointerPosition = canvasPointerToWorld(event.clientX, event.clientY);
+    const mouseX = pointerPosition.x;
+    const mouseY = pointerPosition.y;
 
     const activeDrawing = running && getInput("drawing") === 'drive' ? 'point' : getInput("drawing");
+    if (menu === 'custom car' && activeDrawing === 'paint') {
+        customCarPaintChanged = paintCustomCarPointAt(mouseX, mouseY) || customCarPaintChanged;
+        return;
+    }
+    if (menu === 'custom car' && activeDrawing === 'delete') {
+        const ballIndex = isNearBall(mouseX, mouseY, 24, false, true);
+        if (ballIndex >= carBaseBallCount && getDistance(mouseX, mouseY, balls[ballIndex].x, balls[ballIndex].y) < 24) {
+            deleteBall(ballIndex);
+            carBalls = copyCarBalls(balls);
+            saveCustomCar();
+        }
+        return;
+    }
     if (activeDrawing === 'spring' || activeDrawing === 'hydrolic') {
         selected = isNearBall(mouseX, mouseY, 15, false, true);
+        if (menu === 'custom car' &&
+            (selected === null || getDistance(mouseX, mouseY, balls[selected].x, balls[selected].y) >= 24)) {
+            selected = null;
+        }
        
-    } else if (activeDrawing === 'point' || activeDrawing === 'anchor') {
+    } else if (activeDrawing === 'point') {
     
     
     
@@ -3313,13 +3768,16 @@ mouseX = (mouseX - scrollX / zoom) * zoom
             let ball ={
                 x: mouseX,
                 y: mouseY,
-                xVel: activeDrawing === 'anchor' ? 0 : getInput("xVel"),
-                yVel: activeDrawing === 'anchor' ? 0 : getInput("yVel"),
-                radias: Number(getInput("slider")),
+                xVel: getInput("xVel"),
+                yVel: getInput("yVel"),
+                radias: menu === 'custom car' ? 10 : Number(getInput("slider")),
                 spring:     springsList,
                 springDist: springsDistList,
-                anchor: activeDrawing === 'anchor' ? [mouseX, mouseY] : false,
-                color: carColor
+                anchor: false,
+                customCarPoint: menu === 'custom car',
+                color: menu === 'custom car'
+                    ? document.getElementById('customCarColor').value
+                    : carColor
                
               
 
@@ -3339,6 +3797,10 @@ mouseX = (mouseX - scrollX / zoom) * zoom
             if (
 !(isNearBall(ball.x, ball.y, ball.radias * 2).length > 0)) {
             	balls.push(ball)
+                if (menu === 'custom car') {
+                    carBalls = copyCarBalls(balls);
+                    saveCustomCar();
+                }
             }
         }
     } else if (activeDrawing === 'block') {
@@ -3352,24 +3814,41 @@ mouseX = (mouseX - scrollX / zoom) * zoom
         ropeY = mouseY
     }
 });
+document.addEventListener('pointermove', (event) => {
+    if (!pointerStartedOnCanvas || event.buttons === 0 ||
+        menu !== 'custom car' || drawingInput !== 'paint') return;
+    const pointerPosition = canvasPointerToWorld(event.clientX, event.clientY);
+    customCarPaintChanged = paintCustomCarPointAt(pointerPosition.x, pointerPosition.y) ||
+        customCarPaintChanged;
+});
 function run() {
 running =  true
 }  
 document.addEventListener('pointerup', (event) => {
     if (!pointerStartedOnCanvas) return;
     pointerStartedOnCanvas = false;
-    const rect = canvas.getBoundingClientRect();
-    let mouseUpX = event.clientX - rect.left;
-    let mouseUpY = event.clientY - rect.top;
-mouseUpX = (mouseUpX - scrollX / zoom) * zoom
-mouseUpY = (mouseUpY - scrollY / zoom) * zoom
+    if (customCarPaintChanged) {
+        saveCustomCar();
+        customCarPaintChanged = false;
+    }
+    const pointerPosition = canvasPointerToWorld(event.clientX, event.clientY);
+    const mouseUpX = pointerPosition.x;
+    const mouseUpY = pointerPosition.y;
     const activeDrawing = running && getInput("drawing") === 'drive' ? 'point' : getInput("drawing");
     if (activeDrawing === 'spring' && selected !== null || activeDrawing === 'hydrolic') {
         let target = isNearBall(mouseUpX, mouseUpY, 15, false, true);
+        if (menu === 'custom car' && target !== null &&
+            getDistance(mouseUpX, mouseUpY, balls[target].x, balls[target].y) >= 24) {
+            target = null;
+        }
         if (target !== null && target !== selected) {
             const distOfBalls = getDistance(balls[selected].x, balls[selected].y, balls[target].x, balls[target].y);
             balls[selected].spring.push(target);
             balls[selected].springDist.push(activeDrawing === 'hydrolic' ? distOfBalls / hydrolicSize : distOfBalls);
+            if (menu === 'custom car') {
+                carBalls = copyCarBalls(balls);
+                saveCustomCar();
+            }
 
 
              if (activeDrawing === 'hydrolic'){
@@ -3847,10 +4326,10 @@ if (ball1.snow && Math.random() > 0.5 && !ball2.snow) {
 
         function spring(b1, b2, dist, index, stiffness = DStiffness) {
         
-        if (balls.indexOf(b1) < 46) {
+        if (balls.indexOf(b1) < carBaseBallCount) {
         	dist *= carPuff
         }
-        if (b1.color === 'black' && b2.color === 'black' && balls.indexOf(b1) < 46) {
+        if (b1.color === 'black' && b2.color === 'black' && balls.indexOf(b1) < carBaseBallCount) {
         	dist *= wheelPuff
         }
         
@@ -3873,7 +4352,7 @@ const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || 
                 const snapStrain = Math.max(distOfPoints / dist, dist / distOfPoints) / snapThreshold;
             const b1Index = balls.indexOf(b1);
             const b2Index = balls.indexOf(b2);
-            if (b1Index >= 0 && b1Index < 46 && b2Index >= 0 && b2Index < 46) {
+            if (b1Index >= 0 && b1Index < carBaseBallCount && b2Index >= 0 && b2Index < carBaseBallCount) {
                 playSpringSnapSound(snapStrain);
             }
             b1.spring.splice(springIndex, 1);
@@ -3909,10 +4388,16 @@ const isHydrolic = hydrolics.some(pair => (pair[0] === b1 && pair[1] === b2) || 
 }*/
 
 
-    ctx.strokeStyle = b1.color
-    if (b1.color === carColor && b2.color === "black") {
-ctx.strokeStyle = b2.color
-}
+    const springStartX = ScrollX(b1.x);
+    const springStartY = ScrollY(b1.y);
+    const springEndX = ScrollX(b2.x);
+    const springEndY = ScrollY(b2.y);
+    const springGradient = ctx.createLinearGradient(springStartX, springStartY, springEndX, springEndY);
+    springGradient.addColorStop(0, b1.color || 'black');
+    springGradient.addColorStop(1, b2.color || 'black');
+    ctx.strokeStyle = b1.color === 'black' || b2.color === 'black'
+        ? 'black'
+        : springGradient;
     if (isHydrolic) {
         stiffness /= 2
         const xOfBig = b1.x - (dx / distOfPoints) * dist / 2;
@@ -3927,10 +4412,22 @@ ctx.strokeStyle = b2.color
 
 
 drawTo.push([b1.x, b1.x, balls.indexOf(b2)])
+    const b1Index = balls.indexOf(b1);
+    const b2Index = balls.indexOf(b2);
+    if (b1Index >= 0 && b2Index >= 0 && b1.color !== 'black' && b2.color !== 'black') {
+        for (let thirdIndex = 0; thirdIndex < balls.length; thirdIndex++) {
+            const thirdBall = balls[thirdIndex];
+            if (thirdIndex === b1Index || thirdIndex === b2Index || !thirdBall ||
+                thirdBall.color === 'black' ||
+                !hasSpringConnection(b1Index, thirdIndex) ||
+                !hasSpringConnection(b2Index, thirdIndex)) continue;
+            drawSpringTriangleGradient(b1, b2, thirdBall, [b1Index, b2Index, thirdIndex]);
+        }
+    }
     ctx.lineWidth = Zoom(5);
     ctx.beginPath();
-    ctx.moveTo(ScrollX(b1.x), ScrollY(b1.y));
-    ctx.lineTo(ScrollX(b2.x), ScrollY(b2.y));
+    ctx.moveTo(springStartX, springStartY);
+    ctx.lineTo(springEndX, springEndY);
     ctx.stroke();
 
 
@@ -3977,6 +4474,7 @@ drawTo.push([b1.x, b1.x, balls.indexOf(b2)])
                 yourChance = Math.random() * 100
                 snapped = 0
                 makeCar()
+                applySelectedCarToCurrentGame()
                 target = 26
                 oof = false
                 fire = false
@@ -4155,6 +4653,98 @@ function touchingLine(ball, line) {
             return closeToLine && closeAlongLine
             
 }
+function parseTriangleColor(color) {
+    triangleColorContext.fillStyle = '#000000';
+    triangleColorContext.fillStyle = color || '#000000';
+    const normalized = triangleColorContext.fillStyle;
+    const hexMatch = normalized.match(/^#([0-9a-f]{6})$/i);
+    if (hexMatch) {
+        const value = parseInt(hexMatch[1], 16);
+        return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+    }
+    const rgbMatch = normalized.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+    return rgbMatch ? [Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3])] : [0, 0, 0];
+}
+
+function hasSpringConnection(firstIndex, secondIndex) {
+    return balls[firstIndex]?.spring.includes(secondIndex) ||
+        balls[secondIndex]?.spring.includes(firstIndex);
+}
+
+function getCarBallRadius(ball) {
+    const ballIndex = balls.indexOf(ball);
+    const isSelectedCarPart = isCustomCarActive &&
+        (ball.customCarPoint || (ballIndex >= 0 && ballIndex < carBaseBallCount));
+    const sizeDivisor = isSelectedCarPart
+        ? carBodySize * 5
+        : ball.color === carColor ? carBodySize : 1;
+    return Zoom(ball.radias) / sizeDivisor;
+}
+
+function drawSpringTriangleGradient(first, second, third, indices) {
+    if (indices.some(index => index === 11 || index === 21 || !balls[index]) ||
+        indices.some(index => balls[index].color === 'black')) return;
+    const key = [...indices].sort((a, b) => a - b).join(':');
+    if (renderedSpringTriangles.has(key)) return;
+    renderedSpringTriangles.add(key);
+
+    const points = [first, second, third].map(ball => ({
+        x: ScrollX(ball.x),
+        y: ScrollY(ball.y),
+        color: ball.color || 'black'
+    }));
+    const center = {
+        x: (points[0].x + points[1].x + points[2].x) / 3,
+        y: (points[0].y + points[1].y + points[2].y) / 3
+    };
+    const area = (points[1].x - points[0].x) * (points[2].y - points[0].y) -
+        (points[1].y - points[0].y) * (points[2].x - points[0].x);
+    if (Math.abs(area) < 0.01) return;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    ctx.lineTo(points[1].x, points[1].y);
+    ctx.lineTo(points[2].x, points[2].y);
+    ctx.closePath();
+    ctx.clip();
+
+    const colors = points.map(point => parseTriangleColor(point.color));
+    const centerColor = `rgb(${[0, 1, 2].map(channel =>
+        Math.round((colors[0][channel] + colors[1][channel] + colors[2][channel]) / 3)
+    ).join(',')})`;
+    for (let index = 0; index < 3; index++) {
+        const start = points[index];
+        const end = points[(index + 1) % 3];
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.lineTo(center.x, center.y);
+        ctx.closePath();
+        ctx.clip();
+        const gradient = ctx.createLinearGradient(start.x, start.y, center.x, center.y);
+        gradient.addColorStop(0, start.color);
+        gradient.addColorStop(1, centerColor);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(
+            Math.min(start.x, end.x, center.x),
+            Math.min(start.y, end.y, center.y),
+            Math.max(start.x, end.x, center.x) - Math.min(start.x, end.x, center.x),
+            Math.max(start.y, end.y, center.y) - Math.min(start.y, end.y, center.y)
+        );
+        ctx.restore();
+    }
+    ctx.restore();
+    [first, second, third].forEach((ball, index) => {
+        ctx.fillStyle = points[index].color;
+        ctx.beginPath();
+        const radius = getCarBallRadius(ball);
+        ctx.arc(points[index].x, points[index].y, radius, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+}
+
 function getDistanceFromLine(ball, line) {
         const normal = getNormal(line.x1, line.y1, line.x2, line.y2)
         return dot(line.x1 - ball.x, line.y1 - ball.y, normal.x, normal.y)
@@ -4228,6 +4818,7 @@ function scroll() {
      
 zoom = 1
 function makeCar() {
+carBaseBallCount = standardCarBallCount;
 noGravity = 0
 fireChance = Math.random() * 67
 yourChance = Math.random() * 100
@@ -4275,6 +4866,10 @@ for (let b of balls) {
         }
          
 }
+if (standardCarSpringCount === 1) {
+    standardCarSpringCount = countSurvivalSprings();
+}
+survivalSpringCount = standardCarSpringCount;
 }
 tallness = 500
 wideness = 500
@@ -4284,6 +4879,8 @@ function fillCar(useFullCar = false) {
     if (useFullCar) {
     	balls2 = [...carBalls];
     }
+    if (isCustomCarActive) return;
+    if (!balls2[45] || !balls2[46]) return;
     ctx.fillStyle = carColor
         for (let i = 23; i < 41; i++) {
        
@@ -4318,7 +4915,6 @@ ctx.beginPath()
         ctx.lineTo(ScrollX(balls2[22].x), ScrollY(balls2[22].y))
         ctx.fill()
         }
-       
 }
 // Init
 function spawnDummy(testDummy = false) {                                  
@@ -4487,7 +5083,7 @@ let fireTarget = 26
         yVel: startYVel,
         radias: 5 + Math.random() * 5, 
         spring: [],      
-        springDist: [],  
+        springDist: [],   
         anchor: false,
         color: randomColor,
         fire: true
@@ -4770,6 +5366,203 @@ function deleteBall(ballIndex) {
 
 
 
+function drawGarage() {
+
+  	ctx.lineCap = "round";
+	ctx.fillStyle = '#888';
+	ctx.fillRect(0, 200, canvas.width, 1000);
+    
+     for (let x = canvas.width - 300; x > 0 ; x -= 400) {
+    	
+    	
+		ctx.fillStyle = '#333';
+    	
+		ctx.fillRect(x, 200, 100, 1000);
+    	
+    }
+    
+	ctx.fillStyle = '#555';
+	ctx.fillRect(0, canvas.height - 200, canvas.width, 200);
+    
+	ctx.fillRect(0, 0, canvas.width, 100);
+    
+    for (let x = 0; x < canvas.width; x += 200) {
+    ctx.lineWidth = 5;
+	ctx.strokeStyle = 'black';
+	ctx.beginPath();
+    ctx.moveTo(0 + x, 120);
+    ctx.lineTo(100 + x, 200);
+    ctx.lineTo(200 + x, 120);
+    ctx.lineTo(200 + x, 100);
+    ctx.lineTo(100 + x, 180);
+    ctx.lineTo(0 + x, 100);
+    ctx.moveTo(0 + x, 120);
+    
+    ctx.fill();
+    ctx.stroke();
+    }
+    
+    
+    
+    
+   
+    drawGarageTools(canvas.width - 560, 300)
+	
+}
+
+function drawGarageTools(x, y) {
+    ctx.save();
+    ctx.translate(x, y);
+
+    ctx.save();
+    ctx.translate(0, 100);
+    ctx.scale(1.5, 1.5);
+
+    // hammer
+    ctx.fillStyle = "#8B4513";
+    ctx.fillRect(0, 20, 8, 40);
+    ctx.fillStyle = "#708090";
+    ctx.beginPath();
+    ctx.moveTo(-10, 10);
+    ctx.lineTo(18, 10);
+    ctx.lineTo(18, 22);
+    ctx.lineTo(-5, 22);
+    ctx.lineTo(-10, 15);
+    ctx.closePath();
+    ctx.fill();
+
+    // screwdriver
+    ctx.fillStyle = "#FF4500";
+    ctx.fillRect(30, 35, 10, 25);
+    ctx.fillStyle = "#A9A9A9";
+    ctx.fillRect(34, 10, 2, 25);
+    ctx.fillRect(32, 7, 6, 3);
+
+    // wrench
+    ctx.strokeStyle = "#C0C0C0";
+    ctx.lineWidth = 6;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(60, 15);
+    ctx.lineTo(60, 50);
+    ctx.stroke();
+    ctx.fillStyle = "#C0C0C0";
+    ctx.beginPath();
+    ctx.arc(60, 15, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.beginPath();
+    ctx.arc(60, 11, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = "source-over";
+
+    // pliers
+    ctx.strokeStyle = "#4682B4";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(80, 60);
+    ctx.quadraticCurveTo(83, 35, 88, 25);
+    ctx.moveTo(96, 60);
+    ctx.quadraticCurveTo(93, 35, 88, 25);
+    ctx.stroke();
+    ctx.fillStyle = "#708090";
+    ctx.beginPath();
+    ctx.moveTo(85, 25);
+    ctx.lineTo(85, 10);
+    ctx.lineTo(87, 10);
+    ctx.lineTo(87, 25);
+    ctx.moveTo(91, 25);
+    ctx.lineTo(91, 10);
+    ctx.lineTo(89, 10);
+    ctx.lineTo(89, 25);
+    ctx.fill();
+    ctx.fillStyle = "#333";
+    ctx.beginPath();
+    ctx.arc(88, 25, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // chisel
+    ctx.fillStyle = "#8B4513";
+    ctx.fillRect(125, 40, 8, 20);
+    ctx.fillStyle = "#708090";
+    ctx.fillRect(125, 15, 8, 25);
+    ctx.fillStyle = "#C0C0C0";
+    ctx.fillRect(123, 12, 12, 3);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(0, 0);
+    ctx.scale(1.5, 1.5);
+
+    // mallet
+    ctx.fillStyle = "#A0522D";
+    ctx.fillRect(0, 10, 14, 20);
+    ctx.fillStyle = "#D2B48C";
+    ctx.fillRect(4, 30, 6, 35);
+
+    // level
+    ctx.fillStyle = "#FFD700";
+    ctx.fillRect(25, 25, 12, 40);
+    ctx.fillStyle = "#ADFF2F";
+    ctx.fillRect(29, 40, 4, 10);
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(29, 44, 4, 1);
+
+    // drill
+    ctx.fillStyle = "#DC143C";
+    ctx.beginPath();
+    ctx.moveTo(55, 25);
+    ctx.lineTo(75, 25);
+    ctx.lineTo(75, 37);
+    ctx.lineTo(67, 37);
+    ctx.lineTo(67, 55);
+    ctx.lineTo(57, 55);
+    ctx.lineTo(55, 35);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#708090";
+    ctx.fillRect(75, 29, 8, 4);
+
+    // tape
+    ctx.fillStyle = "#333333";
+    ctx.beginPath();
+    ctx.roundRect(90, 35, 22, 22, 4);
+    ctx.fill();
+    ctx.fillStyle = "#FFD700";
+    ctx.beginPath();
+    ctx.arc(101, 46, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#C0C0C0";
+    ctx.fillRect(112, 51, 6, 4);
+
+    // paintbrush
+    ctx.fillStyle = "#DCDCDC";
+    ctx.fillRect(130, 25, 16, 15);
+    ctx.fillStyle = "#4169E1";
+    ctx.fillRect(130, 20, 16, 5);
+    ctx.fillStyle = "#8B4513";
+    ctx.fillRect(135, 40, 6, 20);
+
+    ctx.restore();
+    ctx.restore();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4950,6 +5743,9 @@ function drawBg(CTX = ctx, CANVAS = canvas) {
   ctx.lineCap = "butt";
   
   }
+  }
+  if (garage) {
+  	drawGarage()
   }
 }
 drawbg = true;
