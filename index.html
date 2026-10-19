@@ -1300,15 +1300,15 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
     <div id="customCarMenu" style="display: none;">
     	<div id='customCarsidePanel'>
         <h2>Custom Car Builder</h2>
-        <p id="customBuildStatus">Choose a tool, then build on the car preview.</p>
+        <p id="customBuildStatus">Choose what to do, then tap the car!</p>
         <div class="custom-builder-tools">
-          <button type="button" class="custom-tool active" onclick="setCarBuildTool('point', this)">Build</button>
-          <button type="button" class="custom-tool" onclick="setCarBuildTool('spring', this)">Connect</button>
-          <button type="button" class="custom-tool" onclick="setCarBuildTool('paint', this)">Paint</button>
-          <button type="button" class="custom-tool" onclick="setCarBuildTool('delete', this)">Erase</button>
+          <button type="button" class="custom-tool active" data-tool="point" onclick="setCarBuildTool('point', this)">Add Part</button>
+          <button type="button" class="custom-tool" data-tool="spring" onclick="setCarBuildTool('spring', this)">Join Parts</button>
+          <button type="button" class="custom-tool" data-tool="paint" onclick="setCarBuildTool('paint', this)">Paint</button>
+          <button type="button" class="custom-tool" data-tool="delete" onclick="setCarBuildTool('delete', this)">Erase</button>
         </div>
         <label class="custom-builder-setting" for="customCarColor">
-          <span>Point / paint color</span>
+          <span>Car color</span>
           <input id="customCarColor" type="color" value="#ff0000" oninput="setCustomCarColor(this.value)">
         </label>
         <div class="custom-builder-tools">
@@ -1351,10 +1351,7 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
           <button id="mobileRight" class="mobile-control" aria-label="Drive right" onpointerdown="setMobileControl('right', true, event)" onpointerup="setMobileControl('right', false, event)" onpointercancel="setMobileControl('right', false, event)">&#8594;</button>
         </div>
     </div>
-    <details class="sound-credits">
-      <summary>Sound credits</summary>
-      <p>Impact: “Dull thud” by gregoryweir, public domain. <a href="https://commons.wikimedia.org/wiki/File:Dull_thud.ogg" target="_blank" rel="noopener noreferrer">Source</a>.</p>
-    </details>
+    
   </div>
 </div>
 
@@ -1650,6 +1647,7 @@ r
 
 
 function toggleRain() {
+    if (!running) return;
 	isRaining = !isRaining
     updateRainSound();
 }
@@ -2012,13 +2010,13 @@ function removeCustomCarRoofPoints(car) {
 function setCarBuildTool(tool, button) {
     drawingInput = tool;
     document.querySelectorAll('.custom-tool').forEach(toolButton => {
-        toolButton.classList.toggle('active', toolButton === button || (!button && tool === 'point' && toolButton.textContent === 'Add Point'));
+        toolButton.classList.toggle('active', toolButton === button || (!button && toolButton.dataset.tool === tool));
     });
     const instructions = {
-        point: 'Click the preview to add a connected point.',
-        spring: 'Drag between two points to connect them.',
-        paint: 'Click or drag over points to paint them.',
-        delete: 'Click an added point to erase it.'
+        point: 'Tap the car to add a new part.',
+        spring: 'Drag between two parts to join them.',
+        paint: 'Tap or drag over parts to paint them.',
+        delete: 'Tap a part you added to erase it.'
     };
     const status = document.getElementById('customBuildStatus');
     if (status) status.textContent = instructions[tool] || instructions.point;
@@ -2044,20 +2042,20 @@ function paintCustomCarPointAt(x, y) {
 
 function saveCustomCar() {
     if (!isValidCustomCar(balls)) {
-        console.error('Cannot save the custom car because its point or spring data is invalid.');
+        console.error('Cannot save the custom car because its part or connection data is invalid.');
         const status = document.getElementById('customBuildStatus');
-        if (status) status.textContent = 'Could not save: the car data is invalid.';
+        if (status) status.textContent = 'Oops! The car needs fixing before it can be saved.';
         return;
     }
     customCarData = copyCarBalls(balls);
     try {
         localStorage.setItem(customCarStorageKey, JSON.stringify(customCarData));
         const status = document.getElementById('customBuildStatus');
-        if (status) status.textContent = 'Custom car saved in this browser.';
+        if (status) status.textContent = 'Car saved!';
     } catch (error) {
         console.error('Could not save the custom car:', error);
         const status = document.getElementById('customBuildStatus');
-        if (status) status.textContent = 'Could not save the car in this browser.';
+        if (status) status.textContent = 'Could not save the car. Try again!';
     }
 }
 
@@ -2072,7 +2070,7 @@ function resetCustomCar() {
 
 function selectCustomCar() {
     if (!isValidCustomCar(balls)) {
-        console.error('Cannot select the custom car because its point or spring data is invalid.');
+        console.error('Cannot select the custom car because its part or connection data is invalid.');
         return;
     }
     saveCustomCar();
@@ -2081,6 +2079,7 @@ function selectCustomCar() {
 }
 
 function resetCar() {
+    if (!running) return;
     makeCar();
     applySelectedCarToCurrentGame();
 }
@@ -5062,6 +5061,7 @@ let fireTarget = 43
 
 
 function explode() {
+    if (!running) return;
 let fireTarget = 26
     playSound(explosionSoundFile, 0.8, explosionSoundPlaybackRate, true);
     if (!balls || !balls[fireTarget]) return;
@@ -5096,6 +5096,7 @@ let fireTarget = 26
 
 fire = false
 function lightning() {
+    if (!running) return;
 	IsRaining = false 
 
 arc = 10
@@ -5138,6 +5139,7 @@ let fireTarget = 26
     }
 }
 function bigBall() {
+    if (!running) return;
     let startX = balls[target].x
   let startY = balls[target].y - 700
   let startXVel = balls[target].xVel;
@@ -5282,7 +5284,7 @@ let fireTarget = 26
 
 
 function avalanche() {
-
+    if (!running) return;
   //if (Math.random() > 0.2) return;
   let fireTarget = 26;
   //if (!balls || !balls[fireTarget]) return;
