@@ -251,7 +251,7 @@ button.active {
   background: rgba(255, 255, 255, 0.2);
   color: white;
   border: 2px solid rgba(255, 255, 255, 0.6);
-  padding: 16px 50px;
+  padding: 16px 0px;/*make x margin 0*/
   font-size: 1.6rem;
   font-weight: bold;
   cursor: pointer;
@@ -268,7 +268,7 @@ button.active {
   background: rgba(255, 255, 255, 0.2);
   color: white;
   border: 2px solid rgba(255, 255, 255, 0.6);
-  padding: 16px 50px;
+  padding: 16px 0px;/*make x margin 0*/
   font-size: 1.6rem;
   font-weight: bold;
   cursor: pointer;
@@ -894,7 +894,13 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
 }
 
 
-
+.on {
+	background: rgba(0, 100, 255, 0.8) !important;
+}
+.homeBtn, #playButton, #levelButton {
+    width: 220px !important;
+    max-width: 100% !important;
+}
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -983,10 +989,9 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
       <h1 style="text-transform: capitalize;">Wobbly Wheels</h1>
 
         
-        <button id="levelButton" onclick="OpenMenu('levels')">Play</button>
-        <button id="playButton" onclick="OpenMenu('settings')">Sanbox</button>
-        
-        <button id="playButton" onclick="OpenMenu('custom car')">Custom Car</button>
+        <button class="homeBtn" id="levelButton" onclick="OpenMenu('levels')">Play</button>
+        <button class="homeBtn" id="playButton" onclick="OpenMenu('car select')">Select Car</button>
+        <button class="homeBtn" id="playButton" onclick="OpenMenu('settings')">Sanbox</button>
         
       </div>
       
@@ -1303,6 +1308,7 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
         <p id="customBuildStatus">Choose what to do, then tap the car!</p>
         <div class="custom-builder-tools">
           <button type="button" class="custom-tool active" data-tool="point" onclick="setCarBuildTool('point', this)">Add Part</button>
+          <button type="button" class="custom-tool" data-tool="spring" onclick="setCarBuildTool('spring', this)">Join Parts</button>
           <button type="button" class="custom-tool" data-tool="paint" onclick="setCarBuildTool('paint', this)">Paint</button>
           <button type="button" class="custom-tool" data-tool="delete" onclick="setCarBuildTool('delete', this)">Erase</button>
         </div>
@@ -1311,7 +1317,8 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
           <input id="customCarColor" type="color" value="#ff0000" oninput="setCustomCarColor(this.value)">
         </label>
         <div class="custom-builder-tools">
-          <button type="button" onclick="resetCustomCar()">Reset Car</button>
+          <button type="button" onclick="resetCustomCar()">Reset Car</button><button type="button" onclick="toggleManual(this)">Manual</button>
+          
         </div>
          </div>
           
@@ -1331,9 +1338,10 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
           
           	<div class="action-footer">
           <button class="back-btn" onclick="OpenMenu('home')">Back</button>
-          <button id="carSelectPLay" class="settings-play-btn" onclick="startLevel()">Play</button>
+          <button id="carSelectPLay" class="settings-play-btn" onclick="selectCar()">Select</button>
           
-          <button id="carSelectCustom" class="custom-btn" onclick="OpenMenu('custom car')">custom</button>
+          
+          <button id="carSelectCustom" class="custom-btn" onclick="OpenMenu('custom car')">Custom</button>
           
         </div>
           
@@ -1355,6 +1363,7 @@ h1, h2, h3, h4, h5, h6, p, button, input, textarea, select, label {
 </div>
 
 <script>
+
 	let garage = false;
 	let cameraRoll = false;
 	let sanboxMode  = false
@@ -1366,9 +1375,11 @@ let stickAmount = 15
 	let deadChance = 1.25
     let carPuff = 1
     let wheelPuff = 1
-  
+    let carModels = 5
+  	let debug = true
 let levels = true;
 let mapId = 0;
+let SelectedcarModel = 1;
 let maps = [
 //normal
 {title: "The Mountain", name: "normal", insideColor: '#888', surfaceColor: "#222",
@@ -1573,6 +1584,22 @@ friction: 1, restitution: 0, springSnap: 5, stiffness: 0.99999, gravity: 0.2,
 
 
 ]
+
+
+
+
+
+let cars = [
+	{name: 'The OG Truck'},
+	{name: 'Bannana Car'},
+	{name: 'Flame'},
+    {name: 'Kidnapper Van'},
+    {name: 'The Cozy Crystal'}
+	
+	
+	
+		
+]
 //hi
 let dead = false
 let m = maps[mapId]
@@ -1643,13 +1670,23 @@ mouseX = (mouseX - scrollX / zoom) * zoom
 r
 */
 
-
+function selectCar() {
+    SelectedcarModel = carModel
+    
+    OpenMenu('home')
+}
 
 function toggleRain() {
     if (!running) return;
 	isRaining = !isRaining
     updateRainSound();
 }
+let manualMode = false
+function toggleManual(btn) {
+  btn.classList.toggle('on');
+  manualMode = btn.classList.contains('on');
+}
+
 
 function pickLevel(levelIn, play = true, levelBtn = false) {
 	
@@ -1746,8 +1783,13 @@ let menu = 'home';
 let selectedCustomCar = null;
 
 function OpenMenu(menuIn = 'home') {
+
+	if ((menuIn === 'home' && (menu === 'car select' || menu === 'custom car')) || menuIn === 'car select') {
+    	makeCar();
+    	carBalls = [...balls];
+    }
   const returningFromCustomCar = isCustomCarActive && menuIn !== 'custom car';
-	menu = menuIn
+	
   if (returningFromCustomCar) {
     if (selectedCustomCar) {
       applySelectedCarToCurrentGame();
@@ -1757,6 +1799,8 @@ function OpenMenu(menuIn = 'home') {
     }
     carBalls = [...balls];
   }
+  menu = menuIn
+  
   const overlayUi = document.getElementById('overlay-ui');
   const homeEl = document.getElementById('home');
   const settingsEl = document.getElementById('settings');
@@ -2059,7 +2103,7 @@ function saveCustomCar() {
 }
 
 function resetCustomCar() {
-    makeCar();
+    makeCar(1);
     balls = removeCustomCarRoofPoints(balls);
     carBaseBallCount = balls.length;
     carBalls = copyCarBalls(balls);
@@ -2089,7 +2133,10 @@ function SyncFromSlider(key, val) {
     num = Math.round(num * 100000) / 100000;
   }
   updateGlobalState(key, num);
-  const valInput = document.getElementById(`${key}-val`);
+  
+  
+  
+  const valInput = document.getElementById(key + `-val`);
   if (valInput) valInput.value = num;
 }
 
@@ -3106,15 +3153,48 @@ function updateTeleporter() {
 
 
 
-//
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let customMenuZoom = 0.2;
+let customMenuZoomTarget = 0.2;
 
 let carBalls = false;
 
 
 
-
-let menuZoom = -300
+let justMoved = false
+let menuZoom = -399
 
 let menuZoom2 = -500
 let menuZoomTarget2 = 0
@@ -3148,20 +3228,24 @@ function update() {
         menuZoom = -300
     }
 	if (isRightPressed || driveLeft) {
-    	if (garage && Math.abs(menuZoom2) < 50) {
+    	if (menu === 'car select'/* && Math.abs(menuZoom2) < 200*/ && !justMoved) {
 			menuZoomTarget2 = -600
+            justMoved = true
+
         }
         rotate(wheel1[0], wheel1[1], 75)
        	rotate(wheel2[0], wheel2[1], 75)
-	}
-    if (isLeftPressed || driveRight) {
-    	if (garage && Math.abs(menuZoom2) < 50) {
+	} else if (isLeftPressed || driveRight) {
+    	if (menu === 'car select'/* && Math.abs(menuZoom2) < 200*/ && !justMoved) {
 			menuZoomTarget2 = 600
+            justMoved = true
         }
-		menuZoomTarget2 = 600
         rotate(wheel1[0], wheel1[1], -75)
 		rotate(wheel2[0], wheel2[1], -75)
-	}
+	} else {
+    	justMoved = false
+    }
+    
 		applySettings()
        doEvents()
        totalColisions = 0
@@ -3187,6 +3271,7 @@ function update() {
     
     
     
+    
     	if (!running && garage) {
         	
         	
@@ -3196,26 +3281,89 @@ function update() {
     
     
         if (!running) {
+        if (menu === 'car select') {
+			ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+			ctx.beginPath();
+			ctx.roundRect(40, 15, 250, 50, 10);
+			ctx.fill();
+
+			ctx.font = "30px Arial";
+			ctx.fillStyle = "white";
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+
+
+			ctx.fillText(cars[carModel - 1].name, 165, 40);
+
+        	
+        }
         //balls = []
         let displayBalls = carBalls
         if (garage) {
         	displayBalls = balls
         }
 
-        
+        if (menu === 'car select') {
+        	
+
+const w = canvas.width;
+const h = canvas.height;
+
+const centerY = h / 2;
+const arrowW = w * 0.06; 
+const arrowH = h * 0.12; 
+const margin = w * 0.05;  
+
+ctx.fillStyle = "#fff";
+
+ctx.beginPath();
+ctx.moveTo(margin, centerY);
+ctx.lineTo(margin + arrowW, centerY - arrowH / 2);
+ctx.lineTo(margin + arrowW, centerY + arrowH / 2);
+ctx.closePath();
+ctx.fill();
+
+ctx.beginPath();
+ctx.moveTo(w - margin, centerY);
+ctx.lineTo(w - margin - arrowW, centerY - arrowH / 2);
+ctx.lineTo(w - margin - arrowW, centerY + arrowH / 2);
+ctx.closePath();
+ctx.fill();
+
+        }
         if (garage) {
+        	customMenuZoom += (customMenuZoomTarget - customMenuZoom) / 20
+        	if (menu === 'custom car') {
+            	menuZoomTarget2 = 30
+            	customMenuZoomTarget = 0.4
+            } else {
+            	customMenuZoomTarget = 0.3
+            
+            
+            }
+
         	menuZoom2 += (menuZoomTarget2 - menuZoom2) / 20
         	scrollX = menuZoom2 - 100;
         	scrollY = -150;
-        	zoom = 0.3;
+        	zoom = customMenuZoom
             menuZoom = -300
-            if (menuZoom2 > 500) {
-            	menuZoom2 = -500
+            if (menuZoom2 > 400) {
+            	menuZoom2 = -400
                 menuZoomTarget2 = 0
+                carModel--
+                if (carModel < 1) {
+                	carModel = carModels
+                }
+                makeCar(carModel)
             }
-            if (menuZoom2 < -500) {
-            	menuZoom2 = 500
+            if (menuZoom2 < -400) {
+            	menuZoom2 = 400
                 menuZoomTarget2 = 0
+                carModel++
+                if (carModel > carModels) {
+                	carModel = 1
+                }
+                makeCar(carModel)
             }
         } else {
         	menuZoom += (-50 - menuZoom) / 10
@@ -3720,12 +3868,65 @@ function doEvents() {
         return;
     }
     if (menu === 'custom car' && activeDrawing === 'delete') {
-        const ballIndex = isNearBall(mouseX, mouseY, 24, false, true);
+     
+        const ballIndex = isNearBall(mouseX, mouseY, 5, false, true);
         if (ballIndex >= carBaseBallCount && getDistance(mouseX, mouseY, balls[ballIndex].x, balls[ballIndex].y) < 24) {
             deleteBall(ballIndex);
             carBalls = copyCarBalls(balls);
             saveCustomCar();
+           
         }
+        for (b of balls) {
+            	for (s of b.spring) {
+                	
+                    
+                    
+           			if (touchingLine({x: mouseX, y: mouseY, radias: 4, xVel: 0, yVel: 0}, 
+                    {x1: b.x, y1: b.y, x2: balls[s].x, y2: balls[s].y})) {
+                    	//b.spring.splice(b.spring.indexOf(s), 1)
+                        //b.springDist.splice(b.spring.indexOf(s), 1)
+                        return
+                        
+                    }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    	
+                    
+                    
+                    
+                    
+                   
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                }
+            }
         return;
     }
     if (activeDrawing === 'spring' || activeDrawing === 'hydrolic') {
@@ -3769,8 +3970,8 @@ function doEvents() {
                 xVel: getInput("xVel"),
                 yVel: getInput("yVel"),
                 radias: menu === 'custom car' ? 10 : Number(getInput("slider")),
-                spring:     springsList,
-                springDist: springsDistList,
+                spring:     manualMode ? [] : springsList,
+                springDist: manualMode ? [] : springsDistList,
                 anchor: false,
                 customCarPoint: menu === 'custom car',
                 color: menu === 'custom car'
@@ -3997,7 +4198,6 @@ function getInput(input) {
 
 
                 let dirtIndex =  level.length
-let copy = []
         let wheel1 = [0, 11]
        
         let wheel2 = [11, 21]
@@ -4467,7 +4667,7 @@ drawTo.push([b1.x, b1.x, balls.indexOf(b2)])
 
 
 
-         if (event.key === 'r') {
+         if (event.key === 'r' && running) {
                 fireChance = Math.random() * 67
                 yourChance = Math.random() * 100
                 snapped = 0
@@ -4537,6 +4737,14 @@ if (event.key === ' ') {
             if (event.key === 's') {
                 avalanche()
             }
+            if (event.key === 'p') {
+                copy(ballsString())
+            }
+            if (event.key === 'o') {
+            	if (debug) {
+                	loadCar(prompt("paist in car", 'paist'))
+                }
+            }
             if (event.key === 'l') {
                 lightning()
             }
@@ -4562,10 +4770,11 @@ if (event.key === ' ') {
                 }
                
             }
-            if (event.key === 'd') {
+            if (event.key === 'd' && running) {
+            
 spawnDummy(false)
 }
-if (event.key === 't') {
+if (event.key === 't' && running) {
 spawnDummy(true)
 }
             if (event.key === 'v') {
@@ -4589,11 +4798,6 @@ spawnDummy(true)
 			}
             
             if (event.key === 'p') {
-				//if (copyed) {
-                //balls = []
-                	//balls = [...copyed];
-                //}
-                alert(balls)
                 
 			}
             if (event.key === 'ArrowDown') {
@@ -4622,7 +4826,6 @@ spawnDummy(true)
             }
             if (event.key === 'x') {
                
-                alert(balls[26].x)
             }
            
          
@@ -4815,11 +5018,13 @@ function scroll() {
     }
      
 zoom = 1
-function makeCar() {
-carBaseBallCount = standardCarBallCount;
-noGravity = 0
-fireChance = Math.random() * 67
-yourChance = Math.random() * 100
+
+function makeCar(carIndex = SelectedcarModel) {
+    carModel = carIndex;
+    carBaseBallCount = standardCarBallCount;
+    noGravity = 0
+    fireChance = Math.random() * 67
+    yourChance = Math.random() * 100
 snapped = 0
 makeMap()
 target = 26
@@ -4833,7 +5038,7 @@ carPuff = 1
 wheelPuff = 1
 time = 0
 nextTeleporterTime = 300 + Math.random() * 240
-
+if (carIndex === 1) {
 balls =
 [{"x":82,"y":236,"xVel":0,"yVel":0,"radias":7,"spring":[10, 4],"springDist":[18.867962264113206,70.7248188403477],"anchor":false},{"x":83,"y":205,"xVel":0,"yVel":0,"radias":7,"spring":[0,11,6,7,3],"springDist":[31.016124838541643,27.892651361962706,63.89053137985315,63.52952069707436,40.459856648287825],"anchor":false},{"x":96,"y":186,"xVel":0,"yVel":0,"radias":7,"spring":[1,10],"springDist":[23.021728866442675,60.03332407921454],"anchor":false},{"x":114,"y":179,"xVel":0,"yVel":0,"radias":7,"spring":[2,11],"springDist":[19.313207915827967,33.24154027718932],"anchor":false},{"x":131,"y":185,"xVel":0,"yVel":0,"radias":7,"spring":[3,1],"springDist":[18.02775637731995,52],"anchor":false},{"x":141,"y":206,"xVel":0,"yVel":0,"radias":7,"spring":[4,11,1],"springDist":[23.259406699226012,31.57530680769389,58.008620049092706],"anchor":false},{"x":144,"y":224,"xVel":0,"yVel":0,"radias":7,"spring":[5,11],"springDist":[18.248287590894655,36.0555127546399],"anchor":false},{"x":139,"y":235,"xVel":0,"yVel":0,"radias":7,"spring":[6,11,2,10],"springDist":[12.08304597359457,37.013511046643494,65.19202405202648,42.44997055358225],"anchor":false},{"x":128,"y":249,"xVel":0,"yVel":0,"radias":7,"spring":[7,11,2],"springDist":[17.804493814764854,41.14608122288197,70.66116330771806],"anchor":false},{"x":113,"y":252,"xVel":0,"yVel":0,"radias":7,"spring":[8,11,3],"springDist":[15.297058540778355,40.11234224026316,73.00684899377592],"anchor":false},{"x":98,"y":246,"xVel":0,"yVel":0,"radias":7,"spring":[9,11,1,4,5],"springDist":[16.155494421403514,36.0555127546399,43.65775990588614,69.35416353759881,58.728187440104094],"anchor":false},{"x":110,"y":212,"xVel":0,"yVel":0,"radias":7,"spring":[4,2,0,22,24],"springDist":[34.20526275297414,29.5296461204668,36.87817782917155,61.741396161732524,53.150729063673246],"anchor":false},{"x":207,"y":231,"xVel":0,"yVel":0,"radias":7,"spring":[13,21,16],"springDist":[24.186773244895647,30,58.52349955359813],"anchor":false},{"x":204,"y":207,"xVel":0,"yVel":0,"radias":7,"spring":[14,21,17,14,19],"springDist":[21.213203435596427,27.658633371878665,58.69412236331676,21.213203435596427,49.678969393496885],"anchor":false},{"x":219,"y":192,"xVel":0,"yVel":0,"radias":7,"spring":[15,18],"springDist":[22.20360331117452,51.85556864985669],"anchor":false},{"x":241,"y":189,"xVel":0,"yVel":0,"radias":7,"spring":[16,21,19,20],"springDist":[18.027756377319946,26,56.222771187482394,52],"anchor":false},{"x":256,"y":199,"xVel":0,"yVel":0,"radias":7,"spring":[17],"springDist":[18.02775637731995],"anchor":false},{"x":262,"y":216,"xVel":0,"yVel":0,"radias":7,"spring":[18,21,14],"springDist":[18.867962264113206,31.144823004794876,49.24428900898052],"anchor":false},{"x":252,"y":232,"xVel":0,"yVel":0,"radias":7,"spring":[19,15,13],"springDist":[20.615528128088304,44.384682042344295,54.120236510939236],"anchor":false},{"x":236,"y":245,"xVel":0,"yVel":0,"radias":7,"spring":[20,21,13,13,15],"springDist":[17,32.38826948140329,49.678969393496885,49.678969393496885,56.222771187482394],"anchor":false},{"x":221,"y":237,"xVel":0,"yVel":0,"radias":7,"spring":[12],"springDist":[15.231546211727817],"anchor":false},{"x":231,"y":213,"xVel":0,"yVel":0,"radias":7,"spring":[20,18,16,14,27,29,11,26],"springDist":[26,28.31960451701259,28.65309756378881,24.186773244895647,66.85057965343307,60.29925372672534,121.00413216084812,79.2085853932514],"anchor":false},{"x":84,"y":156,"xVel":0,"yVel":0,"radias":7,"spring":[44,46],"springDist":[20.09975124224178,35.51056180912941],"anchor":false},{"x":100,"y":158,"xVel":0,"yVel":0,"radias":7,"spring":[22,11,43],"springDist":[16.1245154965971,54.91812087098393,44.011362169330766],"anchor":false},{"x":121,"y":160,"xVel":0,"yVel":0,"radias":7,"spring":[23,46,41,46],"springDist":[21.095023109728984,24.041630560342615,36.6742416417845,24.041630560342615],"anchor":false},{"x":147,"y":159,"xVel":0,"yVel":0,"radias":7,"spring":[24,11,41,40],"springDist":[26.019223662515373,64.63745044476924,33.52610922848042,34.48187929913333],"anchor":false},{"x":174,"y":158,"xVel":0,"yVel":0,"radias":7,"spring":[25,45,11,36],"springDist":[27.018512172212592,40.22437072223754,83.73768566183328,75.6108457828637],"anchor":false},{"x":193,"y":158,"xVel":0,"yVel":0,"radias":7,"spring":[26,45,37],"springDist":[19,33.24154027718932,67.89698078707183],"anchor":false},{"x":212,"y":157,"xVel":0,"yVel":0,"radias":7,"spring":[27,21,35],"springDist":[19.026297590440446,59.135437767890075,65.62011886609167],"anchor":false},{"x":237,"y":153,"xVel":0,"yVel":0,"radias":7,"spring":[28,45,34],"springDist":[25.317977802344327,48.82622246293481,51.0098029794274],"anchor":false},{"x":255,"y":157,"xVel":0,"yVel":0,"radias":7,"spring":[29,21,33],"springDist":[18.439088914585778,60.92618484691127,40],"anchor":false},{"x":271,"y":155,"xVel":0,"yVel":0,"radias":7,"spring":[30,45],"springDist":[16.1245154965971,79.84985911070852],"anchor":false},{"x":269,"y":135,"xVel":0,"yVel":0,"radias":7,"spring":[31,45,30],"springDist":[20.09975124224178,72.69112738154499,26.076809620810597],"anchor":false},{"x":255,"y":117,"xVel":0,"yVel":0,"radias":7,"spring":[32,45,31],"springDist":[22.80350850198276,58.54912467321778,41.2310562561766],"anchor":false},{"x":238,"y":102,"xVel":0,"yVel":0,"radias":7,"spring":[33,45,30],"springDist":[22.671568097509265,47.01063709417263,57.56735185849702],"anchor":false},{"x":221,"y":92,"xVel":0,"yVel":0,"radias":7,"spring":[34,45,29],"springDist":[19.723082923316017,40.80441152620633,63.06346010171025],"anchor":false},{"x":200,"y":87,"xVel":0,"yVel":0,"radias":7,"spring":[35,45],"springDist":[21.587033144922902,38.118237105091836],"anchor":false},{"x":182,"y":91,"xVel":0,"yVel":0,"radias":7,"spring":[36,45,28],"springDist":[18.439088914585778,37.16180835212409,72.49827584156742],"anchor":false},{"x":164,"y":96,"xVel":0,"yVel":0,"radias":7,"spring":[37,45],"springDist":[18.681541692269406,43.9317652729776],"anchor":false},{"x":157,"y":108,"xVel":0,"yVel":0,"radias":7,"spring":[38,45,27],"springDist":[13.892443989449806,43.46262762420146,61.61168720299746],"anchor":false},{"x":157,"y":126,"xVel":0,"yVel":0,"radias":7,"spring":[39,26],"springDist":[18,36.235341863986875],"anchor":false},{"x":137,"y":127,"xVel":0,"yVel":0,"radias":7,"spring":[40,46],"springDist":[20.024984394500787,25.079872407968903],"anchor":false},{"x":113,"y":123,"xVel":0,"yVel":0,"radias":7,"spring":[41,23],"springDist":[24.331050121192874,37.33630940518894],"anchor":false},{"x":84,"y":117,"xVel":0,"yVel":0,"radias":7,"spring":[42,46],"springDist":[29.61418578992169,36.05551275463989],"anchor":false},{"x":82,"y":136,"xVel":0,"yVel":0,"radias":7,"spring":[43],"springDist":[19.1049731745428],"anchor":false},{"x":197,"y":125,"xVel":0,"yVel":0,"radias":7,"spring":[40,25,28,30],"springDist":[40.01249804748512,60.4648658313239,35.34119409414458,66.24198064671678],"anchor":false},{"x":114,"y":137,"xVel":0,"yVel":0,"radias":7,"spring":[42,44,23,25,40,26],"springDist":[14.0356688476182,32.01562118716424,25.238858928247925,39.66106403010388,44.384682042344295,63.56886030125127],"anchor":false}]
     /*balls.splice(wheel2[1], balls.length - (wheel2[1]))
@@ -4869,10 +5074,46 @@ if (standardCarSpringCount === 1) {
 }
 survivalSpringCount = standardCarSpringCount;
 }
+
+
+
+if (carIndex === 2) { 
+    loadCar(`[{"x":82,"y":236,"xVel":0,"yVel":0,"radias":5,"spring":[10,4],"springDist":[18.867962264113206,70.7248188403477],"anchor":false,"color":"black"},{"x":83,"y":205,"xVel":0,"yVel":0,"radias":5,"spring":[0,11,6,7,3],"springDist":[31.016124838541643,27.892651361962706,63.89053137985315,63.52952069707436,40.459856648287825],"anchor":false,"color":"black"},{"x":96,"y":186,"xVel":0,"yVel":0,"radias":5,"spring":[1,10],"springDist":[23.021728866442675,60.03332407921454],"anchor":false,"color":"black"},{"x":114,"y":179,"xVel":0,"yVel":0,"radias":5,"spring":[2,11],"springDist":[19.313207915827967,33.24154027718932],"anchor":false,"color":"black"},{"x":131,"y":185,"xVel":0,"yVel":0,"radias":5,"spring":[3,1],"springDist":[18.02775637731995,52],"anchor":false,"color":"black"},{"x":141,"y":206,"xVel":0,"yVel":0,"radias":5,"spring":[4,11,1],"springDist":[23.259406699226012,31.57530680769389,58.008620049092706],"anchor":false,"color":"black"},{"x":144,"y":224,"xVel":0,"yVel":0,"radias":5,"spring":[5,11],"springDist":[18.248287590894655,36.0555127546399],"anchor":false,"color":"black"},{"x":139,"y":235,"xVel":0,"yVel":0,"radias":5,"spring":[6,11,2,10],"springDist":[12.08304597359457,37.013511046643494,65.19202405202648,42.44997055358225],"anchor":false,"color":"black"},{"x":128,"y":249,"xVel":0,"yVel":0,"radias":5,"spring":[7,11,2],"springDist":[17.804493814764854,41.14608122288197,70.66116330771806],"anchor":false,"color":"black"},{"x":113,"y":252,"xVel":0,"yVel":0,"radias":5,"spring":[8,11,3],"springDist":[15.297058540778355,40.11234224026316,73.00684899377592],"anchor":false,"color":"black"},{"x":98,"y":246,"xVel":0,"yVel":0,"radias":5,"spring":[9,11,1,4,5],"springDist":[16.155494421403514,36.0555127546399,43.65775990588614,69.35416353759881,58.728187440104094],"anchor":false,"color":"black"},{"x":110,"y":212,"xVel":0,"yVel":0,"radias":5,"spring":[4,2,0,22,24],"springDist":[34.20526275297414,29.5296461204668,36.87817782917155,61.741396161732524,53.150729063673246],"anchor":false,"color":"black"},{"x":207,"y":231,"xVel":0,"yVel":0,"radias":5,"spring":[13,21,16],"springDist":[24.186773244895647,30,58.52349955359813],"anchor":false,"color":"black"},{"x":204,"y":207,"xVel":0,"yVel":0,"radias":5,"spring":[14,21,17,14,19],"springDist":[21.213203435596427,27.658633371878665,58.69412236331676,21.213203435596427,49.678969393496885],"anchor":false,"color":"black"},{"x":219,"y":192,"xVel":0,"yVel":0,"radias":5,"spring":[15,18],"springDist":[22.20360331117452,51.85556864985669],"anchor":false,"color":"black"},{"x":241,"y":189,"xVel":0,"yVel":0,"radias":5,"spring":[16,21,19,20],"springDist":[18.027756377319946,26,56.222771187482394,52],"anchor":false,"color":"black"},{"x":256,"y":199,"xVel":0,"yVel":0,"radias":5,"spring":[17],"springDist":[18.02775637731995],"anchor":false,"color":"black"},{"x":262,"y":216,"xVel":0,"yVel":0,"radias":5,"spring":[18,21,14],"springDist":[18.867962264113206,31.144823004794876,49.24428900898052],"anchor":false,"color":"black"},{"x":252,"y":232,"xVel":0,"yVel":0,"radias":5,"spring":[19,15,13],"springDist":[20.615528128088304,44.384682042344295,54.120236510939236],"anchor":false,"color":"black"},{"x":236,"y":245,"xVel":0,"yVel":0,"radias":5,"spring":[20,21,13,13,15],"springDist":[17,32.38826948140329,49.678969393496885,49.678969393496885,56.222771187482394],"anchor":false,"color":"black"},{"x":221,"y":237,"xVel":0,"yVel":0,"radias":5,"spring":[12],"springDist":[15.231546211727817],"anchor":false,"color":"black"},{"x":231,"y":213,"xVel":0,"yVel":0,"radias":5,"spring":[20,18,16,14,27,29,11,26],"springDist":[26,28.31960451701259,28.65309756378881,24.186773244895647,66.85057965343307,60.29925372672534,121.00413216084812,79.2085853932514],"anchor":false,"color":"black"},{"x":84,"y":156,"xVel":0,"yVel":0,"radias":10,"spring":[],"springDist":[],"anchor":false,"color":"#ffea00"},{"x":100,"y":158,"xVel":0,"yVel":0,"radias":10,"spring":[22,11],"springDist":[16.1245154965971,54.91812087098393],"anchor":false,"color":"#ffea00"},{"x":121,"y":160,"xVel":0,"yVel":0,"radias":10,"spring":[23],"springDist":[21.095023109728984],"anchor":false,"color":"#ffea00"},{"x":147,"y":159,"xVel":0,"yVel":0,"radias":10,"spring":[24,11],"springDist":[26.019223662515373,64.63745044476924],"anchor":false,"color":"#ffea00"},{"x":174,"y":158,"xVel":0,"yVel":0,"radias":10,"spring":[25,11],"springDist":[27.018512172212592,83.73768566183328],"anchor":false,"color":"#ffea00"},{"x":193,"y":158,"xVel":0,"yVel":0,"radias":10,"spring":[26],"springDist":[19],"anchor":false,"color":"#ffea00"},{"x":212,"y":157,"xVel":0,"yVel":0,"radias":10,"spring":[27,21],"springDist":[19.026297590440446,59.135437767890075],"anchor":false,"color":"#ffea00"},{"x":237,"y":153,"xVel":0,"yVel":0,"radias":10,"spring":[28],"springDist":[25.317977802344327],"anchor":false,"color":"#ffea00"},{"x":255,"y":157,"xVel":0,"yVel":0,"radias":10,"spring":[29,21],"springDist":[18.439088914585778,60.92618484691127],"anchor":false,"color":"#ffea00"},{"x":271,"y":155,"xVel":0,"yVel":0,"radias":10,"spring":[30],"springDist":[16.1245154965971],"anchor":false,"color":"#ffea00"},{"x":165.7,"y":123.6,"xVel":0,"yVel":0,"radias":10,"spring":[22,23,24,25,26,27,28,29,30],"springDist":[87.88998805324756,74.16097356426761,57.64590184913408,40.03560914985559,35.387144558441,43.91639784863965,57.08984147814742,77.12360209430057,95.34175370738679],"anchor":false,"customCarPoint":true,"color":"#ffea00"},{"x":97.9,"y":123.9,"xVel":0,"yVel":0,"radias":10,"spring":[22,23,24,25,26,32],"springDist":[34.98028015896956,34.16460156360673,42.85813808368254,60.35577851374298,83.39076687499642,67.8006637135655],"anchor":false,"customCarPoint":true,"color":"#ffea00"},{"x":267.1,"y":132,"xVel":0,"yVel":0,"radias":10,"spring":[26,27,28,29,30,31],"springDist":[96.66235047835328,78.5290392148026,60.506280665729264,36.70163484097134,27.774268667239475,23.32830898286457],"anchor":false,"customCarPoint":true,"color":"#ffea00"},{"x":211.89999999999998,"y":119.7,"xVel":0,"yVel":0,"radias":10,"spring":[24,25,26,27,28,29,30,31,32,34],"springDist":[99.43289194225419,75.87160206559498,53.88227909062495,42.709483724343926,37.3001340480165,41.700119903904366,56.999122800267735,68.8396687964142,46.36431817680488,56.55377971453371],"anchor":false,"customCarPoint":true,"color":"#ffea00"},{"x":294.4,"y":116.4,"xVel":0,"yVel":0,"radias":10,"spring":[28,29,30,31,34,35],"springDist":[91.85924014490865,68.07584006092027,56.57490609802192,45.13889675213605,31.442805218364303,82.56597362109892],"anchor":false,"customCarPoint":true,"color":"#ffea00"},{"x":323.5,"y":104.4,"xVel":0,"yVel":0,"radias":10,"spring":[29,30,31,34,36],"springDist":[99.21799231994164,86.36556026565219,72.9150876019497,62.7910821693654,31.477134558278987],"anchor":false,"customCarPoint":true,"color":"#ffea00"},{"x":305.2,"y":90.9,"xVel":0,"yVel":0,"radias":10,"spring":[29,30,31,34,35,36,37],"springDist":[92.2369231923962,83.00150601043332,72.6529421290012,56.04301919061817,97.64389381830284,27.69277884214584,22.74071238989668],"anchor":false,"customCarPoint":true,"color":"#ffea00"},{"x":76.9,"y":117.6,"xVel":0,"yVel":0,"radias":10,"spring":[22,23,24,25,32,33],"springDist":[39.05086426700439,46.53783407078589,61.17654779406893,81.4123455011585,89.00247187578555,21.924643668712157],"anchor":false,"customCarPoint":true,"color":"#ffea00"},{"x":49.300000000000004,"y":134.1,"xVel":0,"yVel":0,"radias":10,"spring":[22,23,24,33,39],"springDist":[41.0329136182163,56.05086975239546,76.23450662265742,49.658836071740545,32.156025873854496],"anchor":false,"customCarPoint":true,"color":"#ffea00"},{"x":46,"y":102,"xVel":0,"yVel":0,"radias":10,"spring":[22,23,24,33,39,40],"springDist":[66.03029607687671,77.79460135510689,94.81033698917012,56.33134118765504,34.614592298624586,32.269180342859656],"anchor":false,"customCarPoint":true,"color":"#ffea00"},{"x":26.200000000000003,"y":111.9,"xVel":0,"yVel":0,"radias":10,"spring":[22,23,33,39,40,41],"springDist":[72.70247588631352,87.01522855224825,72.69724891631044,51.01940807183086,32.03825837963106,22.13707297724792],"anchor":false,"customCarPoint":true,"color":"#ffea00"}]`)
+    
+    
+
+}
+
+
+if (carIndex === 3) { 
+    loadCar(`[{"x":82,"y":236,"xVel":0,"yVel":0,"radias":3,"spring":[10,4],"springDist":[18.867962264113206,70.7248188403477],"anchor":false,"color":"black"},{"x":83,"y":205,"xVel":0,"yVel":0,"radias":3,"spring":[0,11,6,7,3],"springDist":[31.016124838541643,27.892651361962706,63.89053137985315,63.52952069707436,40.459856648287825],"anchor":false,"color":"black"},{"x":96,"y":186,"xVel":0,"yVel":0,"radias":3,"spring":[1,10],"springDist":[23.021728866442675,60.03332407921454],"anchor":false,"color":"black"},{"x":114,"y":179,"xVel":0,"yVel":0,"radias":3,"spring":[2,11],"springDist":[19.313207915827967,33.24154027718932],"anchor":false,"color":"black"},{"x":131,"y":185,"xVel":0,"yVel":0,"radias":3,"spring":[3,1],"springDist":[18.02775637731995,52],"anchor":false,"color":"black"},{"x":141,"y":206,"xVel":0,"yVel":0,"radias":3,"spring":[4,11,1],"springDist":[23.259406699226012,31.57530680769389,58.008620049092706],"anchor":false,"color":"black"},{"x":144,"y":224,"xVel":0,"yVel":0,"radias":3,"spring":[5,11],"springDist":[18.248287590894655,36.0555127546399],"anchor":false,"color":"black"},{"x":139,"y":235,"xVel":0,"yVel":0,"radias":3,"spring":[6,11,2,10],"springDist":[12.08304597359457,37.013511046643494,65.19202405202648,42.44997055358225],"anchor":false,"color":"black"},{"x":128,"y":249,"xVel":0,"yVel":0,"radias":3,"spring":[7,11,2],"springDist":[17.804493814764854,41.14608122288197,70.66116330771806],"anchor":false,"color":"black"},{"x":113,"y":252,"xVel":0,"yVel":0,"radias":3,"spring":[8,11,3],"springDist":[15.297058540778355,40.11234224026316,73.00684899377592],"anchor":false,"color":"black"},{"x":98,"y":246,"xVel":0,"yVel":0,"radias":3,"spring":[9,11,1,4,5],"springDist":[16.155494421403514,36.0555127546399,43.65775990588614,69.35416353759881,58.728187440104094],"anchor":false,"color":"black"},{"x":110,"y":212,"xVel":0,"yVel":0,"radias":3,"spring":[4,2,0,22,24],"springDist":[34.20526275297414,29.5296461204668,36.87817782917155,61.741396161732524,53.150729063673246],"anchor":false,"color":"black"},{"x":207,"y":231,"xVel":0,"yVel":0,"radias":3,"spring":[13,21,16],"springDist":[24.186773244895647,30,58.52349955359813],"anchor":false,"color":"black"},{"x":204,"y":207,"xVel":0,"yVel":0,"radias":3,"spring":[14,21,17,14,19],"springDist":[21.213203435596427,27.658633371878665,58.69412236331676,21.213203435596427,49.678969393496885],"anchor":false,"color":"black"},{"x":219,"y":192,"xVel":0,"yVel":0,"radias":3,"spring":[15,18],"springDist":[22.20360331117452,51.85556864985669],"anchor":false,"color":"black"},{"x":241,"y":189,"xVel":0,"yVel":0,"radias":3,"spring":[16,21,19,20],"springDist":[18.027756377319946,26,56.222771187482394,52],"anchor":false,"color":"black"},{"x":256,"y":199,"xVel":0,"yVel":0,"radias":3,"spring":[17],"springDist":[18.02775637731995],"anchor":false,"color":"black"},{"x":262,"y":216,"xVel":0,"yVel":0,"radias":3,"spring":[18,21,14],"springDist":[18.867962264113206,31.144823004794876,49.24428900898052],"anchor":false,"color":"black"},{"x":252,"y":232,"xVel":0,"yVel":0,"radias":3,"spring":[19,15,13],"springDist":[20.615528128088304,44.384682042344295,54.120236510939236],"anchor":false,"color":"black"},{"x":236,"y":245,"xVel":0,"yVel":0,"radias":3,"spring":[20,21,13,13,15],"springDist":[17,32.38826948140329,49.678969393496885,49.678969393496885,56.222771187482394],"anchor":false,"color":"black"},{"x":221,"y":237,"xVel":0,"yVel":0,"radias":3,"spring":[12],"springDist":[15.231546211727817],"anchor":false,"color":"black"},{"x":231,"y":213,"xVel":0,"yVel":0,"radias":3,"spring":[20,18,16,14,27,29,11,26],"springDist":[26,28.31960451701259,28.65309756378881,24.186773244895647,66.85057965343307,60.29925372672534,121.00413216084812,79.2085853932514],"anchor":false,"color":"black"},{"x":84,"y":156,"xVel":0,"yVel":0,"radias":3,"spring":[],"springDist":[],"anchor":false,"color":"red"},{"x":100,"y":158,"xVel":0,"yVel":0,"radias":3,"spring":[22,11,38],"springDist":[16.1245154965971,54.91812087098393,99.32663908627778],"anchor":false,"color":"red"},{"x":121,"y":160,"xVel":0,"yVel":0,"radias":3,"spring":[23,32],"springDist":[21.095023109728984,67.67188793267111],"anchor":false,"color":"red"},{"x":147,"y":159,"xVel":0,"yVel":0,"radias":3,"spring":[24,11,34,38],"springDist":[26.019223662515373,64.63745044476924,57.38537485838417,101.53604800022927],"anchor":false,"color":"red"},{"x":174,"y":158,"xVel":0,"yVel":0,"radias":3,"spring":[25,11],"springDist":[27.018512172212592,83.73768566183328],"anchor":false,"color":"red"},{"x":193,"y":158,"xVel":0,"yVel":0,"radias":3,"spring":[26,34],"springDist":[19,56.29274262489558],"anchor":false,"color":"red"},{"x":212,"y":157,"xVel":0,"yVel":0,"radias":3,"spring":[27,21],"springDist":[19.026297590440446,59.135437767890075],"anchor":false,"color":"red"},{"x":237,"y":153,"xVel":0,"yVel":0,"radias":3,"spring":[28,33,37,39],"springDist":[25.317977802344327,60.30097051099387,45.57921411508005,79.44322564276679],"anchor":false,"color":"red"},{"x":255,"y":157,"xVel":0,"yVel":0,"radias":3,"spring":[29,21,37],"springDist":[18.439088914585778,60.92618484691127,42.37811033993407],"anchor":false,"color":"red"},{"x":271,"y":155,"xVel":0,"yVel":0,"radias":3,"spring":[30,39],"springDist":[16.1245154965971,82.0687467922171],"anchor":false,"color":"red"},{"x":100.81196289062498,"y":95.40953960496569,"xVel":0,"yVel":0,"radias":10,"spring":[23,22,25],"springDist":[62.595726820591445,62.87961503633728,78.59441090350784],"anchor":false,"customCarPoint":true,"color":"#fff700"},{"x":233.2072265624998,"y":92.8184254591196,"xVel":0,"yVel":0,"radias":10,"spring":[28,30],"springDist":[67.59453357350567,67.78052437569954],"anchor":false,"customCarPoint":true,"color":"#fff700"},{"x":170.22014160156237,"y":106.52232596960245,"xVel":0,"yVel":0,"radias":10,"spring":[26],"springDist":[51.616259580602176],"anchor":false,"customCarPoint":true,"color":"#fff700"},{"x":139.88149414062494,"y":114.50402201234797,"xVel":0,"yVel":0,"radias":10,"spring":[24,26,25],"springDist":[49.2584493669398,55.28085150554865,45.061792937560426],"anchor":false,"customCarPoint":true,"color":"#fff700"},{"x":198.45656738281235,"y":94.51981306901924,"xVel":0,"yVel":0,"radias":10,"spring":[27,29,28],"springDist":[63.71427046114107,70.03947787782357,63.93119994170765],"anchor":false,"customCarPoint":true,"color":"#fff700"},{"x":262.63974609374975,"y":115.31620799871175,"xVel":0,"yVel":0,"radias":10,"spring":[31],"springDist":[40.55486645247993],"anchor":false,"customCarPoint":true,"color":"#fff700"},{"x":120.85571289062496,"y":60.887588476037195,"xVel":0,"yVel":0,"radias":10,"spring":[26,24],"springDist":[110.70291651245324,99.11251654995593],"anchor":false,"customCarPoint":true,"color":"#fff700"},{"x":252.4071533203123,"y":75.06511867532004,"xVel":0,"yVel":0,"radias":10,"spring":[28,30],"springDist":[91.35678856626153,81.97589665013587],"anchor":false,"customCarPoint":true,"color":"#fff700"},{"x":173.8310058593749,"y":76.07562389476313,"xVel":0,"yVel":0,"radias":10,"spring":[25,26,27],"springDist":[87.15707101474092,81.92455040616257,84.13711271844089],"anchor":false,"customCarPoint":true,"color":"#fff700"}]`)
+    
+    
+
+}
+if (carIndex === 4) { 
+    loadCar(`[{"x":82,"y":236,"xVel":0,"yVel":0,"radias":3,"spring":[10,4],"springDist":[18.867962264113206,70.7248188403477],"anchor":false,"color":"black"},{"x":83,"y":205,"xVel":0,"yVel":0,"radias":3,"spring":[0,11,6,7,3],"springDist":[31.016124838541643,27.892651361962706,63.89053137985315,63.52952069707436,40.459856648287825],"anchor":false,"color":"black"},{"x":96,"y":186,"xVel":0,"yVel":0,"radias":3,"spring":[1,10],"springDist":[23.021728866442675,60.03332407921454],"anchor":false,"color":"black"},{"x":114,"y":179,"xVel":0,"yVel":0,"radias":3,"spring":[2,11],"springDist":[19.313207915827967,33.24154027718932],"anchor":false,"color":"black"},{"x":131,"y":185,"xVel":0,"yVel":0,"radias":3,"spring":[3,1],"springDist":[18.02775637731995,52],"anchor":false,"color":"black"},{"x":141,"y":206,"xVel":0,"yVel":0,"radias":3,"spring":[4,11,1],"springDist":[23.259406699226012,31.57530680769389,58.008620049092706],"anchor":false,"color":"black"},{"x":144,"y":224,"xVel":0,"yVel":0,"radias":3,"spring":[5,11],"springDist":[18.248287590894655,36.0555127546399],"anchor":false,"color":"black"},{"x":139,"y":235,"xVel":0,"yVel":0,"radias":3,"spring":[6,11,2,10],"springDist":[12.08304597359457,37.013511046643494,65.19202405202648,42.44997055358225],"anchor":false,"color":"black"},{"x":128,"y":249,"xVel":0,"yVel":0,"radias":3,"spring":[7,11,2],"springDist":[17.804493814764854,41.14608122288197,70.66116330771806],"anchor":false,"color":"black"},{"x":113,"y":252,"xVel":0,"yVel":0,"radias":3,"spring":[8,11,3],"springDist":[15.297058540778355,40.11234224026316,73.00684899377592],"anchor":false,"color":"black"},{"x":98,"y":246,"xVel":0,"yVel":0,"radias":3,"spring":[9,11,1,4,5],"springDist":[16.155494421403514,36.0555127546399,43.65775990588614,69.35416353759881,58.728187440104094],"anchor":false,"color":"black"},{"x":110,"y":212,"xVel":0,"yVel":0,"radias":3,"spring":[4,2,0,22,24],"springDist":[34.20526275297414,29.5296461204668,36.87817782917155,61.741396161732524,53.150729063673246],"anchor":false,"color":"black"},{"x":207,"y":231,"xVel":0,"yVel":0,"radias":3,"spring":[13,21,16],"springDist":[24.186773244895647,30,58.52349955359813],"anchor":false,"color":"black"},{"x":204,"y":207,"xVel":0,"yVel":0,"radias":3,"spring":[14,21,17,14,19],"springDist":[21.213203435596427,27.658633371878665,58.69412236331676,21.213203435596427,49.678969393496885],"anchor":false,"color":"black"},{"x":219,"y":192,"xVel":0,"yVel":0,"radias":3,"spring":[15,18],"springDist":[22.20360331117452,51.85556864985669],"anchor":false,"color":"black"},{"x":241,"y":189,"xVel":0,"yVel":0,"radias":3,"spring":[16,21,19,20],"springDist":[18.027756377319946,26,56.222771187482394,52],"anchor":false,"color":"black"},{"x":256,"y":199,"xVel":0,"yVel":0,"radias":3,"spring":[17],"springDist":[18.02775637731995],"anchor":false,"color":"black"},{"x":262,"y":216,"xVel":0,"yVel":0,"radias":3,"spring":[18,21,14],"springDist":[18.867962264113206,31.144823004794876,49.24428900898052],"anchor":false,"color":"black"},{"x":252,"y":232,"xVel":0,"yVel":0,"radias":3,"spring":[19,15,13],"springDist":[20.615528128088304,44.384682042344295,54.120236510939236],"anchor":false,"color":"black"},{"x":236,"y":245,"xVel":0,"yVel":0,"radias":3,"spring":[20,21,13,13,15],"springDist":[17,32.38826948140329,49.678969393496885,49.678969393496885,56.222771187482394],"anchor":false,"color":"black"},{"x":221,"y":237,"xVel":0,"yVel":0,"radias":3,"spring":[12],"springDist":[15.231546211727817],"anchor":false,"color":"black"},{"x":231,"y":213,"xVel":0,"yVel":0,"radias":3,"spring":[20,18,16,14,27,29,11,26],"springDist":[26,28.31960451701259,28.65309756378881,24.186773244895647,66.85057965343307,60.29925372672534,121.00413216084812,79.2085853932514],"anchor":false,"color":"black"},{"x":84,"y":156,"xVel":0,"yVel":0,"radias":3,"spring":[33],"springDist":[96.72015506306695],"anchor":false,"color":"#c7c7c7"},{"x":100,"y":158,"xVel":0,"yVel":0,"radias":3,"spring":[22,11,33,32],"springDist":[16.1245154965971,54.91812087098393,88.24852458442895,74.02742438535145],"anchor":false,"color":"#ffffff"},{"x":121,"y":160,"xVel":0,"yVel":0,"radias":3,"spring":[23],"springDist":[21.095023109728984],"anchor":false,"color":"#ffffff"},{"x":147,"y":159,"xVel":0,"yVel":0,"radias":3,"spring":[24,11],"springDist":[26.019223662515373,64.63745044476924],"anchor":false,"color":"#ffffff"},{"x":174,"y":158,"xVel":0,"yVel":0,"radias":3,"spring":[25,11,33],"springDist":[27.018512172212592,83.73768566183328,76.6350863921257],"anchor":false,"color":"#ffffff"},{"x":193,"y":158,"xVel":0,"yVel":0,"radias":3,"spring":[26,34,35],"springDist":[19,72.87102275708538,62.54850276960691],"anchor":false,"color":"#ffffff"},{"x":212,"y":157,"xVel":0,"yVel":0,"radias":3,"spring":[27,21],"springDist":[19.026297590440446,59.135437767890075],"anchor":false,"color":"#d9d9d9"},{"x":237,"y":153,"xVel":0,"yVel":0,"radias":3,"spring":[28,35],"springDist":[25.317977802344327,53.98203194337241],"anchor":false,"color":"#ffffff"},{"x":255,"y":157,"xVel":0,"yVel":0,"radias":3,"spring":[29,21,37,36],"springDist":[18.439088914585778,60.92618484691127,38.16356715658301,36.463733387497264],"anchor":false,"color":"#ffffff"},{"x":271,"y":155,"xVel":0,"yVel":0,"radias":3,"spring":[30,36],"springDist":[16.1245154965971,41.04529942256752],"anchor":false,"color":"#ffffff"},{"x":86.287890625,"y":85.25360752850376,"xVel":0,"yVel":0,"radias":3,"spring":[22,27,26],"springDist":[70.78337722405551,129.14918468530465,113.95372634814944],"anchor":false,"customCarPoint":true,"color":"#ffffff"},{"x":149.93828124999993,"y":85.24032602378935,"xVel":0,"yVel":0,"radias":3,"spring":[32,25,24,34,24],"springDist":[63.65039201068164,73.81817528075987,80.16503586186066,52.3932423272028,80.16503586186066],"anchor":false,"customCarPoint":true,"color":"#d9d9d9"},{"x":202.32924804687485,"y":85.72862884555505,"xVel":0,"yVel":0,"radias":3,"spring":[26,25,30,22,23],"springDist":[77.62536559298707,91.81513775127189,88.6217606321511,137.6222240310939,125.27739658207453],"anchor":false,"customCarPoint":true,"color":"#ffffff"},{"x":220.22895507812484,"y":101.68926208907413,"xVel":0,"yVel":0,"radias":3,"spring":[34,28,36],"springDist":[23.98210427253428,55.9195263743259,33.64453346230436],"anchor":false,"customCarPoint":true,"color":"#c7c7c7"},{"x":247.56550292968728,"y":121.3022114709329,"xVel":0,"yVel":0,"radias":3,"spring":[29,30,28,27,26],"springDist":[33.41226795341328,36.463733387497264,50.39084345898161,65.7580549658659,82.21077121777874],"anchor":false,"customCarPoint":true,"color":"#ffffff"},{"x":272.30754394531226,"y":122.98666760377475,"xVel":0,"yVel":0,"radias":3,"spring":[31,36],"springDist":[32.04002375592328,24.79931422604942],"anchor":false,"customCarPoint":true,"color":"#d9d9d9"}]`)
+    
+    
+
+}
+
+if (carIndex === 5) { 
+    loadCar(`[{"x":82,"y":236,"xVel":0,"yVel":0,"radias":3,"spring":[10,4],"springDist":[18.867962264113206,70.7248188403477],"anchor":false,"color":"black"},{"x":83,"y":205,"xVel":0,"yVel":0,"radias":3,"spring":[0,11,6,7,3],"springDist":[31.016124838541643,27.892651361962706,63.89053137985315,63.52952069707436,40.459856648287825],"anchor":false,"color":"black"},{"x":96,"y":186,"xVel":0,"yVel":0,"radias":3,"spring":[1,10],"springDist":[23.021728866442675,60.03332407921454],"anchor":false,"color":"black"},{"x":114,"y":179,"xVel":0,"yVel":0,"radias":3,"spring":[2,11],"springDist":[19.313207915827967,33.24154027718932],"anchor":false,"color":"black"},{"x":131,"y":185,"xVel":0,"yVel":0,"radias":3,"spring":[3,1],"springDist":[18.02775637731995,52],"anchor":false,"color":"black"},{"x":141,"y":206,"xVel":0,"yVel":0,"radias":3,"spring":[4,11,1],"springDist":[23.259406699226012,31.57530680769389,58.008620049092706],"anchor":false,"color":"black"},{"x":144,"y":224,"xVel":0,"yVel":0,"radias":3,"spring":[5,11],"springDist":[18.248287590894655,36.0555127546399],"anchor":false,"color":"black"},{"x":139,"y":235,"xVel":0,"yVel":0,"radias":3,"spring":[6,11,2,10],"springDist":[12.08304597359457,37.013511046643494,65.19202405202648,42.44997055358225],"anchor":false,"color":"black"},{"x":128,"y":249,"xVel":0,"yVel":0,"radias":3,"spring":[7,11,2],"springDist":[17.804493814764854,41.14608122288197,70.66116330771806],"anchor":false,"color":"black"},{"x":113,"y":252,"xVel":0,"yVel":0,"radias":3,"spring":[8,11,3],"springDist":[15.297058540778355,40.11234224026316,73.00684899377592],"anchor":false,"color":"black"},{"x":98,"y":246,"xVel":0,"yVel":0,"radias":3,"spring":[9,11,1,4,5],"springDist":[16.155494421403514,36.0555127546399,43.65775990588614,69.35416353759881,58.728187440104094],"anchor":false,"color":"black"},{"x":110,"y":212,"xVel":0,"yVel":0,"radias":3,"spring":[4,2,0,22,24],"springDist":[34.20526275297414,29.5296461204668,36.87817782917155,61.741396161732524,53.150729063673246],"anchor":false,"color":"black"},{"x":207,"y":231,"xVel":0,"yVel":0,"radias":3,"spring":[13,21,16],"springDist":[24.186773244895647,30,58.52349955359813],"anchor":false,"color":"black"},{"x":204,"y":207,"xVel":0,"yVel":0,"radias":3,"spring":[14,21,17,14,19],"springDist":[21.213203435596427,27.658633371878665,58.69412236331676,21.213203435596427,49.678969393496885],"anchor":false,"color":"black"},{"x":219,"y":192,"xVel":0,"yVel":0,"radias":3,"spring":[15,18],"springDist":[22.20360331117452,51.85556864985669],"anchor":false,"color":"black"},{"x":241,"y":189,"xVel":0,"yVel":0,"radias":3,"spring":[16,21,19,20],"springDist":[18.027756377319946,26,56.222771187482394,52],"anchor":false,"color":"black"},{"x":256,"y":199,"xVel":0,"yVel":0,"radias":3,"spring":[17],"springDist":[18.02775637731995],"anchor":false,"color":"black"},{"x":262,"y":216,"xVel":0,"yVel":0,"radias":3,"spring":[18,21,14],"springDist":[18.867962264113206,31.144823004794876,49.24428900898052],"anchor":false,"color":"black"},{"x":252,"y":232,"xVel":0,"yVel":0,"radias":3,"spring":[19,15,13],"springDist":[20.615528128088304,44.384682042344295,54.120236510939236],"anchor":false,"color":"black"},{"x":236,"y":245,"xVel":0,"yVel":0,"radias":3,"spring":[20,21,13,13,15],"springDist":[17,32.38826948140329,49.678969393496885,49.678969393496885,56.222771187482394],"anchor":false,"color":"black"},{"x":221,"y":237,"xVel":0,"yVel":0,"radias":3,"spring":[12],"springDist":[15.231546211727817],"anchor":false,"color":"black"},{"x":231,"y":213,"xVel":0,"yVel":0,"radias":3,"spring":[20,18,16,14,27,29,11,26],"springDist":[26,28.31960451701259,28.65309756378881,24.186773244895647,66.85057965343307,60.29925372672534,121.00413216084812,79.2085853932514],"anchor":false,"color":"black"},{"x":84,"y":156,"xVel":0,"yVel":0,"radias":3,"spring":[34,32],"springDist":[132.0295656137322,74.4887646292789],"anchor":false,"color":"#00fbff"},{"x":100,"y":158,"xVel":0,"yVel":0,"radias":3,"spring":[22,11,34,37,36],"springDist":[16.1245154965971,54.91812087098393,120.38527582023998,187.6807599813025,37.89174935268155],"anchor":false,"color":"#007bff"},{"x":121,"y":160,"xVel":0,"yVel":0,"radias":3,"spring":[23,37,32],"springDist":[21.095023109728984,169.56299608065143,86.9683809404073],"anchor":false,"color":"#00fbff"},{"x":147,"y":159,"xVel":0,"yVel":0,"radias":3,"spring":[24,11,34,37,32],"springDist":[26.019223662515373,64.63745044476924,89.94474842598159,146.3834131441726,100.15704505575123],"anchor":false,"color":"#00fbff"},{"x":174,"y":158,"xVel":0,"yVel":0,"radias":3,"spring":[25,11,37],"springDist":[27.018512172212592,83.73768566183328,123.5388108423697],"anchor":false,"color":"#00fbff"},{"x":193,"y":158,"xVel":0,"yVel":0,"radias":3,"spring":[26,34,37,32],"springDist":[19,76.1472241236485,109.10270565848978,133.5356119795999],"anchor":false,"color":"#00fbff"},{"x":212,"y":157,"xVel":0,"yVel":0,"radias":3,"spring":[27,21],"springDist":[19.026297590440446,59.135437767890075],"anchor":false,"color":"#00fbff"},{"x":237,"y":153,"xVel":0,"yVel":0,"radias":3,"spring":[28,34,37,34],"springDist":[25.317977802344327,83.52568101197113,78.54437372366745,83.52568101197113],"anchor":false,"color":"#007bff"},{"x":255,"y":157,"xVel":0,"yVel":0,"radias":3,"spring":[29,21,37],"springDist":[18.439088914585778,60.92618484691127,76.26623963306832],"anchor":false,"color":"#00fbff"},{"x":271,"y":155,"xVel":0,"yVel":0,"radias":3,"spring":[30,34,37],"springDist":[16.1245154965971,106.75484324913207,72.38012429993908],"anchor":false,"color":"#00fbff"},{"x":83.54020996093752,"y":81.51265443636692,"xVel":0,"yVel":0,"radias":10,"spring":[33,23,35,36,26,26,28],"springDist":[47.284812260332494,78.23834558258912,88.09822243102076,42.166246771263864,118.4621781214658,118.4621781214658,148.9975066808951],"anchor":false,"customCarPoint":true,"color":"#ff0088"},{"x":130.81757812499995,"y":82.35165978473213,"xVel":0,"yVel":0,"radias":10,"spring":[34],"springDist":[62.42750302089062],"anchor":false,"customCarPoint":true,"color":"#ff0095"},{"x":193.24309082031237,"y":81.85316389638874,"xVel":0,"yVel":0,"radias":10,"spring":[39,35,26,28,30,24],"springDist":[48.767286009858346,52.937642888793235,78.54067222088837,77.4523635427484,97.26748073128654,106.42364476128688],"anchor":false,"customCarPoint":true,"color":"#ff0095"},{"x":160.86264648437492,"y":123.73276345546591,"xVel":0,"yVel":0,"radias":10,"spring":[33,39],"springDist":[51.1380667773776,66.72195229774357],"anchor":false,"customCarPoint":true,"color":"#fff700"},{"x":100.513818359375,"y":120.11173453825035,"xVel":0,"yVel":0,"radias":10,"spring":[25,28],"springDist":[60.607444048967224,117.43045953066412],"anchor":false,"customCarPoint":true,"color":"#fbff00"},{"x":271.87993164062476,"y":82.62522460150595,"xVel":0,"yVel":0,"radias":10,"spring":[34,28,22,38],"springDist":[78.64063079561058,95.48410039824604,201.69959439241637,53.483831447295124],"anchor":false,"customCarPoint":true,"color":"#ff0095"},{"x":311.7326660156247,"y":118.29425583475326,"xVel":0,"yVel":0,"radias":10,"spring":[31,39,28],"springDist":[54.831211325895154,84.51879009474519,106.98008834343743],"anchor":false,"customCarPoint":true,"color":"#fff700"},{"x":227.22656249999983,"y":116.82989669639747,"xVel":0,"yVel":0,"radias":10,"spring":[37],"springDist":[56.24840414383297],"anchor":false,"customCarPoint":true,"color":"#fff700"}]`)
+    
+    
+
+}
+
+for (b of balls) {
+	b.radias = 3
+}
+}
 tallness = 500
 wideness = 500
 zoom = 1
 function fillCar(useFullCar = false) {
+    return
 	let balls2 = [...balls];
     if (useFullCar) {
     	balls2 = [...carBalls];
@@ -5356,6 +5597,24 @@ function deleteBall(ballIndex) {
 
 
 
+function ballsString() {
+   return JSON.stringify(balls);
+}
+
+function loadCar(str) {
+   balls =  JSON.parse(str);
+}
+
+
+async function copy(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    console.log('Text copied successfully!');
+  } catch (err) {
+    console.error('Failed to copy: ', err);
+  }
+}
+
 
 
 
@@ -5371,14 +5630,14 @@ function drawGarage() {
 
   	ctx.lineCap = "round";
 	ctx.fillStyle = '#888';
-	ctx.fillRect(0, 200, canvas.width, 1000);
+	ctx.fillRect(0, 200, canvas.width, 10000);
     
      for (let x = canvas.width - 300; x > 0 ; x -= 400) {
     	
     	
 		ctx.fillStyle = '#333';
     	
-		ctx.fillRect(x, 200, 100, 1000);
+		ctx.fillRect(x, 200, 100, 10000);
     	
     }
     
@@ -5755,3 +6014,12 @@ drawingInput = 'drive'
     </script>
 </body> 
 </html>
+
+
+
+
+
+
+
+
+
